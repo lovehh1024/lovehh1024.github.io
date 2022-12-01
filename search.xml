@@ -4,11 +4,11 @@
   
     
     <entry>
-      <title>typora-vue-theme主题介绍</title>
+      <title>typora书写makdown博客介绍</title>
       <link href="/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/"/>
       <url>/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/</url>
       
-        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id=""><a href="#" class="headerlink" title=""></a></h1>]]></content>
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h3 id="开始书写文章"><a href="#开始书写文章" class="headerlink" title="开始书写文章"></a>开始书写文章</h3><p>写MarkDown这里推荐<strong>Typora</strong>，非常好用，点开创建的文件，先看看里面有啥</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201180851299.png"></p><p>两个虚线之间的内容就是叫<code>Front-matter</code>，主要是你文章的配置，具体配置如下，这里不同主题不一样，我以<strong>Matery</strong>主题为例</p><p><code>Front-matter</code> 选项中的所有内容均为<strong>非必填</strong>的。但我仍然建议至少填写 <code>title</code> 和 <code>date</code> 的值。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201180943689.png"></p><p>**Tips：**你会发现一个问题，每次<code>hexo n</code>的时候<code>Front-matter</code>中内容少的可怜，那怎么修改默认的格式呢？只要去主目录下找到<code>scaffolds</code>文件夹下找到一个**post.md**文件修改即可。</p><p>markd语法：</p><p>书写标题：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181429575.png"></p><p>加粗、斜体、分隔符语法：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181636178.png"></p><p>如何换行：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181715937.png"></p><p>分割多行符：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181801622.png"></p><p>文章中插入列表：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181827454.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181916119.png"></p><p>引用格式：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181946004.png"></p><p>插入链接方法：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201182016427.png"></p><p>文章中插入图片：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201182046541.png"></p><p>参考链接：<a href="https://blog.csdn.net/howareyou2104/article/details/106312703/?ops_request_misc=&amp;request_id=&amp;biz_id=102&amp;utm_term=matery%E5%86%99%E6%96%87%E7%AB%A0%E6%80%8E%E4%B9%88%E5%8A%A0%E6%A0%87%E7%AD%BE%E5%92%8C%E5%88%86%E7%B1%BB&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-6-106312703.142%5Ev67%5Ejs_top,201%5Ev3%5Eadd_ask,213%5Ev2%5Et3_control1&amp;spm=1018.2226.3001.4187">如何用Hexo优雅的书写文章</a></p>]]></content>
       
       
       <categories>
@@ -31,13 +31,25 @@
     
     
     <entry>
-      <title></title>
+      <title>关于gcc</title>
       <link href="/2022/11/26/guan-yu-gcc/"/>
       <url>/2022/11/26/guan-yu-gcc/</url>
       
         <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="关于GCC"><a href="#关于GCC" class="headerlink" title="关于GCC"></a>关于GCC</h1><h2 id="什么是GCC"><a href="#什么是GCC" class="headerlink" title="什么是GCC?"></a>什么是GCC?</h2><ul><li><p>GCC原名GNU C语言编译器（GUN C  Compiler）</p></li><li><p>GNU编译器套件包括C、C++、0bjective-C、Java、Ada和 Go语言前端，也包括了这些语言的库（如 libstdc++,libgcj等）</p></li><li><p>GCC不仅支持c的许多“方言”．也可以区别不同的C语言标准;可以使用命令行选项来控制编译器在翻译源代码时应该遵循哪个c标准。例如，当使用命令行参数’’-std=c99’启动GCC时，编译器支持c99标准。</p></li><li><p>安装命令 sudo apt install gcc g++ （版本.4.8.5）</p></li><li><p>查看版本 gcc/g++ -v/–version</p><br><h2 id="GCC工作流程"><a href="#GCC工作流程" class="headerlink" title="GCC工作流程"></a>GCC工作流程</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221129183504459.png" alt="GCC工作流程"></p><h2 id="GCC和G-的区别"><a href="#GCC和G-的区别" class="headerlink" title="GCC和G++的区别"></a>GCC和G++的区别</h2><h3 id="gcc和g-都是GUN（组织）的一个编译器。"><a href="#gcc和g-都是GUN（组织）的一个编译器。" class="headerlink" title="gcc和g++都是GUN（组织）的一个编译器。"></a>gcc和g++都是GUN（组织）的一个编译器。</h3><h3 id="误区一：GCC只能编译c代码，g-只能编译c-代码-两者都可以，请注意："><a href="#误区一：GCC只能编译c代码，g-只能编译c-代码-两者都可以，请注意：" class="headerlink" title="误区一：GCC只能编译c代码，g++只能编译c++代码.两者都可以，请注意："></a>误区一：GCC只能编译c代码，g++只能编译c++代码.两者都可以，请注意：</h3><p>  后缀为.c的, gcc 把它当作是c程序，而g++当作是c++程序</p><p>  后缀为.cpp 的，两者都会认为是C++程序，C++的语法规则更加严谨一些</p><p>  编译阶段， g++会调用gcc，对于C++代码，两者是等价的，但是因为gcc<br>  命令不能自动和C++程序使用的库联接，所以通常用g++来完成链接，为了统一起见，干脆编译/链接统     统用g++了，这就给人一种错觉，好像cpp程序只能用c++似的  </p><h3 id="误区二-gcc不会定义-cplusplus-宏，而g-会"><a href="#误区二-gcc不会定义-cplusplus-宏，而g-会" class="headerlink" title="误区二: gcc不会定义_cplusplus 宏，而g++会:"></a>误区二: gcc不会定义_cplusplus 宏，而g++会:</h3><p>  实际上，这个宏只是标志着编译器将会把代码按c还是C++语法来解释</p><p>  如上所述，如果后缀为.c，并且采用gcc 编译器，则该宏就是未定义的，否则就是已经定义的</p><h3 id="误区三-编译只能用gcc，链接只能用g"><a href="#误区三-编译只能用gcc，链接只能用g" class="headerlink" title="误区三:编译只能用gcc，链接只能用g++"></a>误区三:编译只能用gcc，链接只能用g++</h3><p>  严格来说，这句话不算错误，但是它混淆了概念，应该这样说:编译可以用编译可以用gcc/g++，而链接可以用g++或者gcc -lstdc++</p><p>  gcc命令不能自动和C++程序使用的库联接，所以通常使用g++来完成联接，但在编译阶段, g++会自动调用gcc，二者等价</p><h2 id="GCC常用参数选项"><a href="#GCC常用参数选项" class="headerlink" title="GCC常用参数选项"></a>GCC常用参数选项</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221129183630128.png" alt="GCC常用参数选项"></p></li></ul>]]></content>
       
       
+      <categories>
+          
+          <category> gcc </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> gcc </tag>
+            
+        </tags>
       
     </entry>
     
