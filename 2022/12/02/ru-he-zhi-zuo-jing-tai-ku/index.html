@@ -7,8 +7,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="关于gcc, lovehh&#39;s blog">
-    <meta name="description" content="gcc的认识以及gcc和g++的一些区别。">
+    <meta name="keywords" content="静态库的制作与使用, lovehh&#39;s blog">
+    <meta name="description" content="库、静态库、制作静态库">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -20,7 +20,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>关于gcc | lovehh&#39;s blog</title>
+    <title>静态库的制作与使用 | lovehh&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     
 
@@ -276,12 +276,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">关于gcc</h1>
+                    <h1 class="description center-align post-title">静态库的制作与使用</h1>
                 </div>
             </div>
         </div>
@@ -305,8 +305,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/gcc/">
-                                <span class="chip bg-color">gcc</span>
+                            <a href="/tags/%E5%BA%93/">
+                                <span class="chip bg-color">库</span>
+                            </a>
+                        
+                            <a href="/tags/%E9%9D%99%E6%80%81%E5%BA%93/">
+                                <span class="chip bg-color">静态库</span>
                             </a>
                         
                     </div>
@@ -317,8 +321,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/gcc/" class="post-category">
-                                gcc
+                            <a href="/categories/%E5%88%B6%E4%BD%9C%E9%9D%99%E6%80%81%E5%BA%93/" class="post-category">
+                                制作静态库
                             </a>
                         
                     </div>
@@ -330,21 +334,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2022-11-26
+                    2022-12-02
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-12-01
+                    2022-12-02
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    526
+                    271
                 </div>
                 
 
@@ -371,27 +375,30 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="关于GCC"><a href="#关于GCC" class="headerlink" title="关于GCC"></a>关于GCC</h1><h2 id="什么是GCC"><a href="#什么是GCC" class="headerlink" title="什么是GCC?"></a>什么是GCC?</h2><ul>
-<li><p>GCC原名GNU C语言编译器（GUN C  Compiler）</p>
+                <h2 id="什么是库？"><a href="#什么是库？" class="headerlink" title="什么是库？"></a>什么是库？</h2><ol>
+<li>库文件是计算机上的一类文件， 可以简单的把库文件看成一种代码仓库，它提供给使用者可以直接拿来用的变量、函数或者类。</li>
+<li>库是特殊的一种程序．编写库的程序和编写一般的程序区别不大，只是库不能单独运行。</li>
+<li>库文件有两种，静态库和动态库（共享库)，区别是:静态库在程序的链接阶段被复制到了程序中;动态库在链接阶段没有被复制到程序中，而是程序在运行时由系统动态加载到内存中供程序调用。</li>
+<li>库的好处: 1.代码保密   2.方便部署和分发</li>
+</ol>
+<h2 id="静态库的制作"><a href="#静态库的制作" class="headerlink" title="静态库的制作"></a>静态库的制作</h2><p>命名规则：</p>
+<p>linux：<strong>libxxx.a</strong></p>
+<ul>
+<li>lib：前缀，固定</li>
+<li>xxx：库的名字</li>
+<li>.a：后缀 固定</li>
+</ul>
+<p>windows：<strong>libxxx.lib</strong></p>
+<p>制作静态库：</p>
+<ul>
+<li><p>gcc获得.o文件</p>
 </li>
-<li><p>GNU编译器套件包括C、C++、0bjective-C、Java、Ada和 Go语言前端，也包括了这些语言的库（如 libstdc++,libgcj等）</p>
+<li><p>将.o文件打包，使用ar工具（archive）</p>
 </li>
-<li><p>GCC不仅支持c的许多“方言”．也可以区别不同的C语言标准;可以使用命令行选项来控制编译器在翻译源代码时应该遵循哪个c标准。例如，当使用命令行参数’’-std=c99’启动GCC时，编译器支持c99标准。</p>
-</li>
-<li><p>安装命令 sudo apt install gcc g++ （版本.4.8.5）</p>
-</li>
-<li><p>查看版本 gcc/g++ -v/–version</p>
-<br>
-
-<h2 id="GCC工作流程"><a href="#GCC工作流程" class="headerlink" title="GCC工作流程"></a>GCC工作流程</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221129183504459.png" alt="GCC工作流程"></p>
-<h2 id="GCC和G-的区别"><a href="#GCC和G-的区别" class="headerlink" title="GCC和G++的区别"></a>GCC和G++的区别</h2><h3 id="gcc和g-都是GUN（组织）的一个编译器。"><a href="#gcc和g-都是GUN（组织）的一个编译器。" class="headerlink" title="gcc和g++都是GUN（组织）的一个编译器。"></a>gcc和g++都是GUN（组织）的一个编译器。</h3><h3 id="误区一：GCC只能编译c代码，g-只能编译c-代码-两者都可以，请注意："><a href="#误区一：GCC只能编译c代码，g-只能编译c-代码-两者都可以，请注意：" class="headerlink" title="误区一：GCC只能编译c代码，g++只能编译c++代码.两者都可以，请注意："></a>误区一：GCC只能编译c代码，g++只能编译c++代码.两者都可以，请注意：</h3><p>  后缀为.c的, gcc 把它当作是c程序，而g++当作是c++程序</p>
-<p>  后缀为.cpp 的，两者都会认为是C++程序，C++的语法规则更加严谨一些</p>
-<p>  编译阶段， g++会调用gcc，对于C++代码，两者是等价的，但是因为gcc<br>  命令不能自动和C++程序使用的库联接，所以通常用g++来完成链接，为了统一起见，干脆编译/链接统     统用g++了，这就给人一种错觉，好像cpp程序只能用c++似的  </p>
-<h3 id="误区二-gcc不会定义-cplusplus-宏，而g-会"><a href="#误区二-gcc不会定义-cplusplus-宏，而g-会" class="headerlink" title="误区二: gcc不会定义_cplusplus 宏，而g++会:"></a>误区二: gcc不会定义_cplusplus 宏，而g++会:</h3><p>  实际上，这个宏只是标志着编译器将会把代码按c还是C++语法来解释</p>
-<p>  如上所述，如果后缀为.c，并且采用gcc 编译器，则该宏就是未定义的，否则就是已经定义的</p>
-<h3 id="误区三-编译只能用gcc，链接只能用g"><a href="#误区三-编译只能用gcc，链接只能用g" class="headerlink" title="误区三:编译只能用gcc，链接只能用g++"></a>误区三:编译只能用gcc，链接只能用g++</h3><p>  严格来说，这句话不算错误，但是它混淆了概念，应该这样说:编译可以用编译可以用gcc/g++，而链接可以用g++或者gcc -lstdc++</p>
-<p>  gcc命令不能自动和C++程序使用的库联接，所以通常使用g++来完成联接，但在编译阶段, g++会自动调用gcc，二者等价</p>
-<h2 id="GCC常用参数选项"><a href="#GCC常用参数选项" class="headerlink" title="GCC常用参数选项"></a>GCC常用参数选项</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221129183630128.png" alt="GCC常用参数选项"></p>
+<li><p><strong>ar rcs libxxx.a xxx.o xxx.o</strong></p>
+<p>r -将文件插入备存文件中</p>
+<p>c -建立备存文件</p>
+<p>s -索引</p>
 </li>
 </ul>
 
@@ -410,7 +417,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="/about" rel="external nofollow noreferrer">Lovehh</a>
+                    <a href="/about" rel="external nofollow noreferrer">lovehh1024</a>
                 </span>
             </div>
             <div class="reprint__type">
@@ -420,7 +427,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://lovehh1024.github.io/2022/11/26/guan-yu-gcc/">https://lovehh1024.github.io/2022/11/26/guan-yu-gcc/</a>
+                    <a href="https://lovehh1024.github.io/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/">https://lovehh1024.github.io/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -433,7 +440,7 @@
                     本博客所有文章除特別声明外，均采用
                     <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
                     许可协议。转载请注明来源
-                    <a href="/about" target="_blank">Lovehh</a>
+                    <a href="/about" target="_blank">lovehh1024</a>
                     !
                 </span>
             </div>
@@ -458,8 +465,12 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/gcc/">
-                                    <span class="chip bg-color">gcc</span>
+                                <a href="/tags/%E5%BA%93/">
+                                    <span class="chip bg-color">库</span>
+                                </a>
+                            
+                                <a href="/tags/%E9%9D%99%E6%80%81%E5%BA%93/">
+                                    <span class="chip bg-color">静态库</span>
                                 </a>
                             
                         </div>
@@ -805,9 +816,64 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="静态库的制作与使用">
+                        
+                        <span class="card-title">静态库的制作与使用</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            库、静态库、制作静态库
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-12-02
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%88%B6%E4%BD%9C%E9%9D%99%E6%80%81%E5%BA%93/" class="post-category">
+                                    制作静态库
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E5%BA%93/">
+                        <span class="chip bg-color">库</span>
+                    </a>
+                    
+                    <a href="/tags/%E9%9D%99%E6%80%81%E5%BA%93/">
+                        <span class="chip bg-color">静态库</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
             <div class="card">
                 <a href="/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/">
                     <div class="card-image">
@@ -825,9 +891,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2022-12-01
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-12-01
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -849,56 +915,6 @@
                     
                     <a href="/tags/Markdown/">
                         <span class="chip bg-color">Markdown</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
-            </div>
-            <div class="card">
-                <a href="/2022/11/26/guan-yu-gcc/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="关于gcc">
-                        
-                        <span class="card-title">关于gcc</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            gcc的认识以及gcc和g++的一些区别。
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2022-11-26
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/gcc/" class="post-category">
-                                    gcc
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/gcc/">
-                        <span class="chip bg-color">gcc</span>
                     </a>
                     
                 </div>

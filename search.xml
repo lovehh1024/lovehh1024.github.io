@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>静态库的制作与使用</title>
+      <link href="/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/"/>
+      <url>/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="什么是库？"><a href="#什么是库？" class="headerlink" title="什么是库？"></a>什么是库？</h2><ol><li>库文件是计算机上的一类文件， 可以简单的把库文件看成一种代码仓库，它提供给使用者可以直接拿来用的变量、函数或者类。</li><li>库是特殊的一种程序．编写库的程序和编写一般的程序区别不大，只是库不能单独运行。</li><li>库文件有两种，静态库和动态库（共享库)，区别是:静态库在程序的链接阶段被复制到了程序中;动态库在链接阶段没有被复制到程序中，而是程序在运行时由系统动态加载到内存中供程序调用。</li><li>库的好处: 1.代码保密   2.方便部署和分发</li></ol><h2 id="静态库的制作"><a href="#静态库的制作" class="headerlink" title="静态库的制作"></a>静态库的制作</h2><p>命名规则：</p><p>linux：<strong>libxxx.a</strong></p><ul><li>lib：前缀，固定</li><li>xxx：库的名字</li><li>.a：后缀 固定</li></ul><p>windows：<strong>libxxx.lib</strong></p><p>制作静态库：</p><ul><li><p>gcc获得.o文件</p></li><li><p>将.o文件打包，使用ar工具（archive）</p></li><li><p><strong>ar rcs libxxx.a xxx.o xxx.o</strong></p><p>r -将文件插入备存文件中</p><p>c -建立备存文件</p><p>s -索引</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 制作静态库 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 库 </tag>
+            
+            <tag> 静态库 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>typora书写makdown博客介绍</title>
       <link href="/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/"/>
       <url>/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/</url>
