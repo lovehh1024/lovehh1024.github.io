@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>LeetCode题解|977.有序数组的平方 209.长度最小的子数组 59.螺旋矩阵</title>
+      <link href="/2022/12/08/2022-12-08-leetcode-ti-jie-977.you-xu-shu-zu-de-ping-fang-209.chang-du-zui-xiao-de-zi-shu-zu-59.luo-xuan-ju-zhen/"/>
+      <url>/2022/12/08/2022-12-08-leetcode-ti-jie-977.you-xu-shu-zu-de-ping-fang-209.chang-du-zui-xiao-de-zi-shu-zu-59.luo-xuan-ju-zhen/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="977-有序数组的平方"><a href="#977-有序数组的平方" class="headerlink" title="977.有序数组的平方"></a>977.有序数组的平方</h2><p>题目链接：<a href="https://leetcode.cn/problems/squares-of-a-sorted-array/">977. 有序数组的平方 - 力扣（LeetCode）</a></p><p>这道题比较简单，关键思路在于，有序数组平方后大的值可能出现在数组的首尾，因此可以采用双指针的思想，一首一尾指针，然后比较大小，将比较后的数按要求放在存放结果的数组中即可。</p><p>题解如下：<img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221208160511102.png" alt="image-20221208160511102"></p><h2 id="209-长度最小的子数组"><a href="#209-长度最小的子数组" class="headerlink" title="209.长度最小的子数组"></a>209.长度最小的子数组</h2><p>题目链接：<a href="https://leetcode.cn/problems/minimum-size-subarray-sum/">209. 长度最小的子数组 - 力扣（LeetCode）</a></p><p>这道题属于是滑动窗口的经典题型，但是再次拿到手后还是写的磕磕绊绊，再次学习了一下代码随想录（<a href="https://www.programmercarl.com/0209.%E9%95%BF%E5%BA%A6%E6%9C%80%E5%B0%8F%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84.html#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3">代码随想录 (programmercarl.com)</a>）发现是没有真正掌握精髓之处<img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/20210312160441942.png" alt="leetcode_209">认真学习了之后也是能够顺利拿下此题。题解：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221208183208157.png" alt="image-20221208183208157"></p><h2 id="59-螺旋矩阵"><a href="#59-螺旋矩阵" class="headerlink" title="59.螺旋矩阵"></a>59.螺旋矩阵</h2><p>题目链接：<a href="https://leetcode.cn/problems/spiral-matrix-ii/">59. 螺旋矩阵 II - 力扣（LeetCode）</a></p><p>面对这道题有点麻，得认真思索一番再结合carl哥的讲解才能AC,标记一下，多加复习这道题。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 算法 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 双指针法 </tag>
+            
+            <tag> 滑动窗口法 </tag>
+            
+            <tag> 螺旋矩阵 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>算法-二分法、双指针法</title>
       <link href="/2022/12/07/2022-12-07-suan-fa-er-fen-fa/"/>
       <url>/2022/12/07/2022-12-07-suan-fa-er-fen-fa/</url>

@@ -7,8 +7,8 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="静态库的制作与使用, lovehh&#39;s blog">
-    <meta name="description" content="库、静态库、制作静态库">
+    <meta name="keywords" content="LeetCode题解|977.有序数组的平方 209.长度最小的子数组 59.螺旋矩阵, lovehh&#39;s blog">
+    <meta name="description" content="双指针法、滑动窗口法">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -20,7 +20,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>静态库的制作与使用 | lovehh&#39;s blog</title>
+    <title>LeetCode题解|977.有序数组的平方 209.长度最小的子数组 59.螺旋矩阵 | lovehh&#39;s blog</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     
 
@@ -276,12 +276,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">静态库的制作与使用</h1>
+                    <h1 class="description center-align post-title">LeetCode题解|977.有序数组的平方 209.长度最小的子数组 59.螺旋矩阵</h1>
                 </div>
             </div>
         </div>
@@ -305,12 +305,16 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/%E5%BA%93/">
-                                <span class="chip bg-color">库</span>
+                            <a href="/tags/%E5%8F%8C%E6%8C%87%E9%92%88%E6%B3%95/">
+                                <span class="chip bg-color">双指针法</span>
                             </a>
                         
-                            <a href="/tags/%E9%9D%99%E6%80%81%E5%BA%93/">
-                                <span class="chip bg-color">静态库</span>
+                            <a href="/tags/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%B3%95/">
+                                <span class="chip bg-color">滑动窗口法</span>
+                            </a>
+                        
+                            <a href="/tags/%E8%9E%BA%E6%97%8B%E7%9F%A9%E9%98%B5/">
+                                <span class="chip bg-color">螺旋矩阵</span>
                             </a>
                         
                     </div>
@@ -321,8 +325,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/%E5%88%B6%E4%BD%9C%E9%9D%99%E6%80%81%E5%BA%93/" class="post-category">
-                                制作静态库
+                            <a href="/categories/%E7%AE%97%E6%B3%95/" class="post-category">
+                                算法
                             </a>
                         
                     </div>
@@ -334,21 +338,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2022-12-02
+                    2022-12-08
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2022-12-02
+                    2022-12-08
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    271
+                    266
                 </div>
                 
 
@@ -375,32 +379,14 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="什么是库？"><a href="#什么是库？" class="headerlink" title="什么是库？"></a>什么是库？</h2><ol>
-<li>库文件是计算机上的一类文件， 可以简单的把库文件看成一种代码仓库，它提供给使用者可以直接拿来用的变量、函数或者类。</li>
-<li>库是特殊的一种程序．编写库的程序和编写一般的程序区别不大，只是库不能单独运行。</li>
-<li>库文件有两种，静态库和动态库（共享库)，区别是:静态库在程序的链接阶段被复制到了程序中;动态库在链接阶段没有被复制到程序中，而是程序在运行时由系统动态加载到内存中供程序调用。</li>
-<li>库的好处: 1.代码保密   2.方便部署和分发</li>
-</ol>
-<h2 id="静态库的制作"><a href="#静态库的制作" class="headerlink" title="静态库的制作"></a>静态库的制作</h2><p>命名规则：</p>
-<p>linux：<strong>libxxx.a</strong></p>
-<ul>
-<li>lib：前缀，固定</li>
-<li>xxx：库的名字</li>
-<li>.a：后缀 固定</li>
-</ul>
-<p>windows：<strong>libxxx.lib</strong></p>
-<p>制作静态库：</p>
-<ul>
-<li><p>gcc获得.o文件</p>
-</li>
-<li><p>将.o文件打包，使用ar工具（archive）</p>
-</li>
-<li><p><strong>ar rcs libxxx.a xxx.o xxx.o</strong></p>
-<p>r -将文件插入备存文件中</p>
-<p>c -建立备存文件</p>
-<p>s -索引</p>
-</li>
-</ul>
+                <h2 id="977-有序数组的平方"><a href="#977-有序数组的平方" class="headerlink" title="977.有序数组的平方"></a>977.有序数组的平方</h2><p>题目链接：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/squares-of-a-sorted-array/">977. 有序数组的平方 - 力扣（LeetCode）</a></p>
+<p>这道题比较简单，关键思路在于，有序数组平方后大的值可能出现在数组的首尾，因此可以采用双指针的思想，一首一尾指针，然后比较大小，将比较后的数按要求放在存放结果的数组中即可。</p>
+<p>题解如下：<img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221208160511102.png" alt="image-20221208160511102"></p>
+<h2 id="209-长度最小的子数组"><a href="#209-长度最小的子数组" class="headerlink" title="209.长度最小的子数组"></a>209.长度最小的子数组</h2><p>题目链接：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-size-subarray-sum/">209. 长度最小的子数组 - 力扣（LeetCode）</a></p>
+<p>这道题属于是滑动窗口的经典题型，但是再次拿到手后还是写的磕磕绊绊，再次学习了一下代码随想录（<a target="_blank" rel="noopener" href="https://www.programmercarl.com/0209.%E9%95%BF%E5%BA%A6%E6%9C%80%E5%B0%8F%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84.html#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3">代码随想录 (programmercarl.com)</a>）发现是没有真正掌握精髓之处<img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/20210312160441942.png" alt="leetcode_209">认真学习了之后也是能够顺利拿下此题。题解：</p>
+<p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221208183208157.png" alt="image-20221208183208157"></p>
+<h2 id="59-螺旋矩阵"><a href="#59-螺旋矩阵" class="headerlink" title="59.螺旋矩阵"></a>59.螺旋矩阵</h2><p>题目链接：<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/spiral-matrix-ii/">59. 螺旋矩阵 II - 力扣（LeetCode）</a></p>
+<p>面对这道题有点麻，得认真思索一番再结合carl哥的讲解才能AC,标记一下，多加复习这道题。</p>
 
                 
             </div>
@@ -417,7 +403,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="/about" rel="external nofollow noreferrer">lovehh1024</a>
+                    <a href="/about" rel="external nofollow noreferrer">Lovehh</a>
                 </span>
             </div>
             <div class="reprint__type">
@@ -427,7 +413,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://lovehh1024.github.io/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/">https://lovehh1024.github.io/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/</a>
+                    <a href="https://lovehh1024.github.io/2022/12/08/2022-12-08-leetcode-ti-jie-977.you-xu-shu-zu-de-ping-fang-209.chang-du-zui-xiao-de-zi-shu-zu-59.luo-xuan-ju-zhen/">https://lovehh1024.github.io/2022/12/08/2022-12-08-leetcode-ti-jie-977.you-xu-shu-zu-de-ping-fang-209.chang-du-zui-xiao-de-zi-shu-zu-59.luo-xuan-ju-zhen/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -440,7 +426,7 @@
                     本博客所有文章除特別声明外，均采用
                     <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
                     许可协议。转载请注明来源
-                    <a href="/about" target="_blank">lovehh1024</a>
+                    <a href="/about" target="_blank">Lovehh</a>
                     !
                 </span>
             </div>
@@ -465,12 +451,16 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/%E5%BA%93/">
-                                    <span class="chip bg-color">库</span>
+                                <a href="/tags/%E5%8F%8C%E6%8C%87%E9%92%88%E6%B3%95/">
+                                    <span class="chip bg-color">双指针法</span>
                                 </a>
                             
-                                <a href="/tags/%E9%9D%99%E6%80%81%E5%BA%93/">
-                                    <span class="chip bg-color">静态库</span>
+                                <a href="/tags/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%B3%95/">
+                                    <span class="chip bg-color">滑动窗口法</span>
+                                </a>
+                            
+                                <a href="/tags/%E8%9E%BA%E6%97%8B%E7%9F%A9%E9%98%B5/">
+                                    <span class="chip bg-color">螺旋矩阵</span>
                                 </a>
                             
                         </div>
@@ -816,9 +806,68 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2022/12/08/2022-12-08-leetcode-ti-jie-977.you-xu-shu-zu-de-ping-fang-209.chang-du-zui-xiao-de-zi-shu-zu-59.luo-xuan-ju-zhen/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="LeetCode题解|977.有序数组的平方 209.长度最小的子数组 59.螺旋矩阵">
+                        
+                        <span class="card-title">LeetCode题解|977.有序数组的平方 209.长度最小的子数组 59.螺旋矩阵</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            双指针法、滑动窗口法
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-12-08
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E7%AE%97%E6%B3%95/" class="post-category">
+                                    算法
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E5%8F%8C%E6%8C%87%E9%92%88%E6%B3%95/">
+                        <span class="chip bg-color">双指针法</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%B3%95/">
+                        <span class="chip bg-color">滑动窗口法</span>
+                    </a>
+                    
+                    <a href="/tags/%E8%9E%BA%E6%97%8B%E7%9F%A9%E9%98%B5/">
+                        <span class="chip bg-color">螺旋矩阵</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
             <div class="card">
                 <a href="/2022/12/07/2022-12-07-suan-fa-er-fen-fa/">
                     <div class="card-image">
@@ -836,9 +885,9 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2022-12-07
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-12-07
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -860,59 +909,6 @@
                     
                     <a href="/tags/%E5%8F%8C%E6%8C%87%E9%92%88%E6%B3%95/">
                         <span class="chip bg-color">双指针法</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="typora书写makdown博客介绍">
-                        
-                        <span class="card-title">typora书写makdown博客介绍</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            使用typora书写博客。
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2022-12-01
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/Markdown/" class="post-category">
-                                    Markdown
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/Typora/">
-                        <span class="chip bg-color">Typora</span>
-                    </a>
-                    
-                    <a href="/tags/Markdown/">
-                        <span class="chip bg-color">Markdown</span>
                     </a>
                     
                 </div>
