@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>线程概述</title>
+      <link href="/2022/12/29/2022-12-29-xian-cheng-gai-shu/"/>
+      <url>/2022/12/29/2022-12-29-xian-cheng-gai-shu/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-线程同步"><a href="#01-x2F-线程同步" class="headerlink" title="01 / 线程同步"></a>01 / 线程同步</h2><ul><li>线程的主要优势在于，能够通过全局变量来共享信息。不过，这种便捷的共享是有代价的: 必须确保多个线程不会同时修改同一变量，或者某一线程不会读取正在由其他线程修改的变量。</li><li>临界区是指访问某一共享资源的代码片段，并且这段代码的执行应为原子操作，也就是同时访问同一共享资源的其他线程不应中断该片段的执行。</li><li>线程同步:即当有一个线程在对内存进行操作时，其他线程都不可以对这个内存地址进行操作，直到该线程完成操作，其他线程才能对该内存地址进行操作，而其他线程则处于等待状态。</li></ul><h2 id="02-x2F-互斥量"><a href="#02-x2F-互斥量" class="headerlink" title="02 / 互斥量"></a>02 / 互斥量</h2><ul><li><p>为避免线程更新共享变量时出现问题，可以使用互斥量 (mutex 是 mutual exclusion的缩写)来确保同时仅有一个线程可以访问某项共享资源。可以使用互斥量来保证对任意共享资源的原子访问。</p></li><li><p>互斥量有两种状态: 已锁定 (locked) 和未锁定 (unlocked) 。任何时候，至多只有个线程可以锁定该互斥量。试图对已经锁定的某一互斥量再次加锁，将可能阻塞线程或者报错失败，具体取决于加锁时使用的方法。</p></li><li><p>一旦线程锁定互斥量，随即成为该互斥量的所有者，只有所有者才能给互斥量解锁。一般情况下，对每一共享资源 (可能由多个相关变量组成) 会使用不同的互斥量，每一线程在访问同一资源时将采用如下协议:</p><p>​针对共享资源锁定互斥量<br>​访问共享资源<br>​对互斥量解锁</p></li><li><p>如果多个线程试图执行这一块代码 (一个临界区)，事实上只有一个线程能够持有该互斥量(其他线程将遭到阻塞)，即同时只有一个线程能够进入这段代码区域，如下图所示：</p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227200319295.png"></p><h2 id="03-x2F-互斥量相关操作函数"><a href="#03-x2F-互斥量相关操作函数" class="headerlink" title="03 / 互斥量相关操作函数"></a>03 / 互斥量相关操作函数</h2><ul><li>互斥量的类型 <code>pthread_mutex_t</code></li><li><code> int pthread_mutex_init (pthread_mutex_t  *restrict mutex,const pthread_mutexattr_t *restrict attr);</code></li><li><code>int pthread_mutex_destroy (pthread_mutex_t  *mutex);</code></li><li><code>int pthread_mutex_lock(pthread_mutex_t *mutex);</code></li><li><code>int pthread_mutex_trylock(pthread_mutex_t  *mutex);</code></li><li><code>int pthread_mutex_unlock (pthread_mutex_t *mutex);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227200423191.png"></p><h2 id="04-x2F-死锁"><a href="#04-x2F-死锁" class="headerlink" title="04 / 死锁"></a>04 / 死锁</h2><ul><li><p>有时，一个线程需要同时访问两个或更多不同的共享资源，而每个资源又都由不同的互斥量管理。当超过一个线程加锁同一组互斥量时，就有可能发生死锁。</p></li><li><p>两个或两个以上的进程在执行过程中，因争夺共享资源而造成的一种互相等待的现象若无外力作用，它们都将无法推进下去。此时称系统处于死锁状态或系统产生了死锁。</p></li><li><p>死锁的几种场景</p><p> 忘记释放锁</p><p> 重复加锁</p><p>多线程多锁，抢占锁资源</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227215631856.png"></p></li></ul><h2 id="05-x2F-读写锁"><a href="#05-x2F-读写锁" class="headerlink" title="05 / 读写锁"></a>05 / 读写锁</h2><ul><li>当有一个线程已经持有互斥锁时，互斥锁将所有试图进入临界区的线程都阻塞住。但是考虑一种情形，当前持有互斥锁的线程只是要读访问共享资源，而同时有其它几个线程也想读取这个共享资源，但是由于互斥锁的排它性，所有其它线程都无法获取锁，也就无法读访问共享资源了，但是实际上多个线程同时读访问共享资源并不会导致问题。</li><li>在对数据的读写操作中，更多的是读操作，写操作较少，例如对数据库数据的读写应用。为了满足当前能够允许多个读出，但只允许一个写入的需求，线程提供了读写锁来实现。</li><li>读写锁的特点：</li></ul><p>​ 如果有其它线程读数据，则允许其它线程执行读操作，但不允许写操作。</p><p>​如果有其它线程写数据，则其它线程都不允许读、写操作。</p><p>​写是独占的，写的优先级高。</p><h2 id="06-x2F-读写锁相关操作函数"><a href="#06-x2F-读写锁相关操作函数" class="headerlink" title="06 / 读写锁相关操作函数"></a>06 / 读写锁相关操作函数</h2><ul><li>读写锁的类型 pthread_rwlock_t</li><li><code>int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock,const pthread _rwlockattr_t  *restrict attr);</code></li><li><code>int pthread_rwlock destroy(pthread_rwlock_t  *rwlock);</code></li><li><code>int pthread_rwlock_rdlock(pthread_rwlock t  *rwlock);</code></li><li><code>int pthread_rwlock_tryrdlock(pthread_rwlock t  *rwlock);</code></li><li><code>int pthread_rwlock_wrlock(pthread_rwlock_t  *rwlock);</code></li><li><code>int pthread_rwlock_trywrlock(pthread_rwlock_t  *rwlock);</code></li><li><code>int pthread_rwlock unlock(pthread_rwlock_t  *rwlock);</code></li></ul><h2 id="07-x2F-生产者消费者模型"><a href="#07-x2F-生产者消费者模型" class="headerlink" title="07 / 生产者消费者模型"></a>07 / 生产者消费者模型</h2><ul><li><p>生产者消费者模型是一种并发编程模式，通常用于解决多线程或多进程中的同步问题。在这个模型中，有两个主要角色：生产者和消费者。</p></li><li><p>生产者负责生成一些数据或物品，将它们放入共享的缓冲区或队列中。消费者则负责从缓冲区或队列中取出这些数据或物品，并进行一些处理或消费。</p></li><li><p>由于多个生产者和消费者可能同时访问共享的缓冲区或队列，因此必须采取同步措施以避免数据竞争和同步问题。例如，可以使用互斥锁、信号量、条件变量等机制来协调不同线程之间的操作，确保数据能够正确地交换和处理。</p></li><li><p>在实际应用中，生产者消费者模型可以用于许多场景，例如消息队列、任务调度、生产流水线等等。通过将任务拆分成生产者和消费者的角色，可以提高程序的可伸缩性和并发性，并且可以更好地管理系统资源。</p></li><li><p><strong>生产者消费者模式</strong>就是通过一个容器来解决生产者和消费者的强耦合问题。生产者和消费者彼此之间不直接通讯，而通过阻塞队列来进行通讯，所以生产者生产完数据之后不用等待消费者处理，直接扔给阻塞队列，消费者不找生产者要数据，而是直接从阻塞队列里取，阻塞队列就相当于一个缓冲区，平衡了生产者和消费者的处理能力。这个阻塞队列就是用来给生产者和消费者解耦的。</p></li><li><p><strong>生产者和生产者竞争关系(互斥)，生产者和消费者(同步)，消费者和消费者竞争关系(互斥)</strong></p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227195551730.png"></p><h2 id="08-x2F-条件变量"><a href="#08-x2F-条件变量" class="headerlink" title="08 / 条件变量"></a>08 / 条件变量</h2><ul><li><p><strong>条件变量</strong>是生产者消费者模型中常用的同步机制之一，它提供了一种线程间通信的方式，允许线程在特定条件下等待或通知其他线程。</p></li><li><p>在生产者消费者模型中，条件变量通常与互斥锁一起使用，以避免竞争条件和数据不一致问题。当生产者在缓冲区已满时需要等待，或者消费者在缓冲区为空时需要等待时，就可以使用条件变量来实现等待和通知的过程。</p></li><li><p>当某个线程需要等待某个条件时，它会调用条件变量的<code>wait()</code>方法，并在这个方法内部自动释放它所持有的互斥锁，然后等待其他线程调用条件变量的<code>notify()</code>或<code>notify_all()</code>方法来通知它。当某个线程满足了特定条件并调用了条件变量的<code>notify()</code>或<code>notify_all</code>()方法时，等待的线程将会被唤醒，并重新尝试获取互斥锁并检查条件是否满足。</p></li><li><p>在生产者消费者模型中，通常会有两个条件变量：一个用于表示缓冲区已满的条件，另一个用于表示缓冲区为空的条件。这样，当生产者将数据放入缓冲区时，如果缓冲区已满，生产者就会等待缓冲区为空的条件变量；而当消费者从缓冲区取出数据时，如果缓冲区为空，消费者就会等待缓冲区已满的条件变量。这样可以确保生产者和消费者之间的同步，避免数据竞争和同步问题。</p></li></ul><p><code>条件变量的类型 pthread_cond_t</code></p><p><code>int pthread_cond_init (pthread_cond_t *restrict cond, const</code><br><code>pthread_condattr_t  *restrict attr);</code></p><p><code>int pthread_cond_destroy(pthread_cond_t  *cond);</code></p><p><code>int pthread_cond_wait(pthread_cond_t  *restrict cond,pthread_mutex_t *restrict mutex);</code></p><p><code>int pthread_cond_timedwait(pthread_cond_t  *restrict cond,pthread- mutex_t  *restrict  mutex, const struct timespec *restrict abstime) ;</code></p><p><code>int pthread_cond_signal(pthread_cond_t  *cond);</code></p><p><code>int pthread_cond_broadcast(pthread_cond_t  *cond);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227202447884.png"></p><h2 id="09-x2F-信号量"><a href="#09-x2F-信号量" class="headerlink" title="09 / 信号量"></a>09 / 信号量</h2><ul><li><p>信号量是生产者消费者模型中常用的同步机制之一，它可以用来管理并发进程或线程的访问和操作资源的数量。</p></li><li><p>信号量实际上是一个整数值，可以通过特定的操作来改变它的值，常见的操作有两个：P（<code>proberen</code>）和V（<code>verhogen</code>）。</p></li><li><p>当一个线程需要使用某个共享资源时，它需要执行P操作，如果信号量的值为正数，则将信号量的值减1，并继续执行；如果信号量的值为0，则该线程将被阻塞，直到有其他线程执行V操作来增加信号量的值。</p></li><li><p>当一个线程释放了某个共享资源时，它需要执行V操作，将信号量的值加1，并通知其他被阻塞的线程有资源可用。</p></li><li><p>在生产者消费者模型中，可以使用信号量来控制生产者和消费者之间的资源访问。例如，可以使用一个信号量表示缓冲区中可用的数据项数量，当生产者向缓冲区中添加数据时，执行P操作减少信号量的值；当消费者从缓冲区中取出数据时，执行V操作增加信号量的值。</p></li><li><p>需要注意的是，在使用信号量进行同步时，必须遵循一定的规则，以避免死锁和竞争条件等问题。例如，在进行P操作时，必须先获取一个互斥锁，以避免多个线程同时尝试减小信号量的值，从而导致数据竞争问题。同时，在使用信号量进行同步时，还需要考虑好信号量的初始值、信号量值是否可变等问题。</p></li><li><p><code>信号量的类型 sem_t</code> </p></li><li><p><code>int sem_init(sem_t *sem, int pshared, unsigned int value);</code></p></li><li><p><code>int sem_destroy(sem_t *sem);</code></p></li><li><p><code>int sem_wait(sem_t *sem) ;</code></p></li><li><p><code>int sem_trywait(sem_t *sem) ;</code></p></li><li><p><code>int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);</code></p></li><li><p><code>int sem_post(sem_t *sem) ;</code></p></li><li><p><code>int sem_getvalue(sem_t *sem, int *sval) ;</code></p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227204819100.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多线程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>线程概述</title>
+      <link href="/2022/12/28/2022-12-28-xian-cheng-gai-shu/"/>
+      <url>/2022/12/28/2022-12-28-xian-cheng-gai-shu/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-线程概述"><a href="#01-x2F-线程概述" class="headerlink" title="01/线程概述"></a>01/线程概述</h2><ul><li>与进程 (process)类似，线程 (thread) 是允许应用程序并发执行多个任务的一种机制。一个进程可以包含多个线程。同一个程序中的所有线程均会独立执行相同程序，且共享同一份全局内存区域，其中包括初始化数据段、未初始化数据段，以及堆内存段。 (传统意义上的 UNIX 进程只是多线程程序的一个特例，该进程只包含一个线程)</li><li>进程是 CPU 分配资源的最小单位，线程是操作系统调度执行的最小单位。<br>线程是轻量级的进程 (LWP: Light weight Process)，在 Lnux 环境下线程的本质仍是进程。</li><li>查看指定进程的 LWP 号: <code>ps -Lf pid</code></li></ul><h2 id="02-x2F-线程和进程区别"><a href="#02-x2F-线程和进程区别" class="headerlink" title="02/线程和进程区别"></a>02/线程和进程区别</h2><ul><li>进程间的信息难以共享。由于除去只读代码段外，父子进程并未共享内存，因此必须采用一些进程间通信方式，在进程进行信息交换。</li><li>调用 <code>fork()</code>来创建进程的代价相对较高，即便利用写时复制技术，仍然需要复制诸如内存页表和文件描述符表之类的多种进程属性，这意味着 <code>fork()</code> 调用在时间上的开销依然不菲。</li><li>线程之间能够方便、快速地共享信息。只需将数据复制到共享 (全局或堆)变量中即可。</li><li>创建线程比创建进程通常要快 10 倍甚至更多。线程间是共享虚拟地址空间的，无需采用写时复制来复制内存，也无需复制页表。</li></ul><h2 id="03-x2F-线程之间共享和非共享资源"><a href="#03-x2F-线程之间共享和非共享资源" class="headerlink" title="03/线程之间共享和非共享资源"></a>03/线程之间共享和非共享资源</h2><h3 id="共享资源"><a href="#共享资源" class="headerlink" title="共享资源"></a>共享资源</h3><ul><li>进程 ID 和父进程 ID</li><li>进程组 ID 和会话 ID</li><li>用户 ID 和用户组 ID</li><li>文件描述符表</li><li>信号处置<br>文件系统的相关信息:文件权限掩码(umask)、当前工作目录</li><li>虚拟地址空间 (除栈、.text)</li></ul><h3 id="非共享资源"><a href="#非共享资源" class="headerlink" title="非共享资源"></a>非共享资源</h3><ul><li>线程ID</li><li>信号掩码</li><li>线程特有数据</li><li>error 变量</li><li>实时调度策略和优先级</li><li>栈，本地变量和函数的调用链接信息</li></ul><h2 id="04-x2F-NPTL"><a href="#04-x2F-NPTL" class="headerlink" title="04/ NPTL"></a>04/ NPTL</h2><ul><li>当 Linux 最初开发时，在内核中并不能真正支持线程。但是它的确可以通过 <code>clone ()</code>系统调用将进程作为可调度的实体。这个调用创建了调用进程 <code>(calling process)</code>的一个拷贝，这个拷贝与调用进程共享相同的地址空间。LinuxThreads 项目使用这个调用来完成在用户空间模拟对线程的支持。不幸的是，这种方法有一些缺点，尤其是在信号处理、调度和进程间同步等方面都存在问题。另外，这个线程模型也不符合 POSIX 的要求。</li><li>要改进 LinuxThreads，需要内核的支持，并且重写线程库。有两个相互竞争的项目开始来满足这些要求。一个包括 IBM 的开发人员的团队开展了 NGPT (Next-GenerationPOSIX Threads)项目。同时，Red Hat 的一些开发人员开展了 NPTI 项目。NGPT在 2003 年中期被放弃了，把这个领域完全留给了NPTL。</li><li>NPTL，或称为 Native POSIX Thread Library，是 Linux 线程的一个新实现，它克服了 LinuxThreads 的缺点，同时也符合 POSIX 的需求。与 LinuxThreads 相比，它在性能和稳定性方面都提供了重大的改进。</li><li>查看当前 pthread 库版本<code>getconf GNU_LIBPTHREAD_VERSION</code></li></ul><h2 id="05-x2F-线程操作"><a href="#05-x2F-线程操作" class="headerlink" title="05 / 线程操作"></a>05 / 线程操作</h2><ul><li>i<code>nt pthread_create(pthread_t *thread, const pthread_attr_t *attr,void  *( *start routine)  (void *), void *arg);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227195909066.png"></p><ul><li><code>pthread_t pthread_self(void);</code></li><li><code>int pthread_equal(pthread_t t1, pthread_t t2);</code></li><li><code>void pthread_exit(void *retval) ;</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227195955386.png"></p><ul><li><code>int pthread_join(pthread_t thread, void **retval);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227200040306.png"></p><ul><li><code>int pthread_detach(pthread_t thread);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227200129555.png"></p><ul><li><code>int pthread_cancel(pthread_t thread);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227200215450.png"></p><h2 id="06-x2F-线程属性"><a href="#06-x2F-线程属性" class="headerlink" title="06 / 线程属性"></a>06 / 线程属性</h2><ul><li>线程属性类型 <code>pthread_attr_t</code></li><li><code>int pthread_attr_init (pthread_attr_t *attr);</code></li><li><code>int pthread_attr_destroy(pthread_attr_t *attr);</code></li><li><code>int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);</code></li><li><code>int pthread_attr_setdetachstate(pthread_attr_t  *attr, intdetachstate);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230227200305821.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多线程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>守护进程</title>
+      <link href="/2022/12/27/2022-12-27-shou-hu-jin-cheng/"/>
+      <url>/2022/12/27/2022-12-27-shou-hu-jin-cheng/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-终端"><a href="#01-x2F-终端" class="headerlink" title="01 / 终端"></a>01 / 终端</h2><ul><li>在 UNIX 系统中，用户通过终端登录系统后得到一个 shell 进程，这个终端成为  进程的控制终端 (Controlling Terminal) ，进程中，控制终端是保存在 PCB 中的信息，而 <code>fork()</code> 会复制 PCB 中的信息，因此由 shell进程启动的其它进程的控制终端也是这个终端。</li><li>默认情况下(没有重定向)，每个进程的标准输入、标准输出和标准错误输出都指向控制终端，进程从标准输入读也就是读用户的键盘输入，进程往标准输出或标准错误输出写也就是输出到显示器上。</li><li>在控制终端输入一些特殊的控制键可以给前台进程发信号，例如 <code>ctrl + c</code>会产生 <code>SIGINT</code> 信号，<code>ctrl + \</code> 会产生 <code>SIGQUIT</code> 信号。</li></ul><h2 id="02-x2F-进程组"><a href="#02-x2F-进程组" class="headerlink" title="02/ 进程组"></a>02/ 进程组</h2><ul><li>进程组和会话在进程之间形成了一种两级层次关系: 进程组是一组相关进程的集合会话是一组相关进程组的集合。进程组和会话是为支持 shell 作业控制而定义的抽象概念，用户通过 shell 能够交互式地在前台或后台运行命令。</li><li>进行组由一个或多个共享同一进程组标识符 (PGID) 的进程组成。一个进程组拥有一个进程组首进程，该进程是创建该组的进程，其进程 ID 为该进程组的 ID，新进程会继承其父进程所属的进程组 ID。</li><li>进程组拥有一个生命周期，其开始时间为首进程创建组的时刻，结束时间为最后一人成员进程退出组的时刻。一个进程可能会因为终止而退出进程组，也可能会因为加入了另外一个进程组而退出进程组。进程组首进程无需是最后一个离开进程组的成员。</li></ul><h2 id="03-x2F-会话"><a href="#03-x2F-会话" class="headerlink" title="03 / 会话"></a>03 / 会话</h2><ul><li>会话是一组进程组的集合。会话首进程是创建该新会话的进程，其进程 ID 会成为会话 ID。新进程会继承其父进程的会话 ID。</li><li>一个会话中的所有进程共享单个控制终端。控制终端会在会话首进程首次打开一个终端设备时被建立。一个终端最多可能会成为一个会话的控制终端。</li><li>在任一时刻，会话中的其中一个进程组会成为终端的前台进程组，其他进程组会成为后台进程组。只有前台进程组中的进程才能从控制终端中读取输入。当用户在控制终端中输入终端字符生成信号后，该信号会被发送到前台进程组中的所有成员。</li><li>当控制终端的连接建立起来之后，会话首进程会成为该终端的控制进程。</li></ul><h2 id="04-x2F-进程组、会话、控制终端之间的关系"><a href="#04-x2F-进程组、会话、控制终端之间的关系" class="headerlink" title="04 / 进程组、会话、控制终端之间的关系"></a>04 / 进程组、会话、控制终端之间的关系</h2><ul><li><code>find / 2 &gt; /dev/null  |  wc -l &amp;</code></li><li><code>sort &lt; longlist  uniq  -c</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230226182705.png"></p><h2 id="05-x2F-进程组、会话操作函数"><a href="#05-x2F-进程组、会话操作函数" class="headerlink" title="05 / 进程组、会话操作函数"></a>05 / 进程组、会话操作函数</h2><ul><li><code>pid_t getpgrp(void);</code></li><li><code>pid_t getpgid(pid_t pid) ;</code></li><li><code>int setpgid(pid_t pid,pid_t pgid);</code></li><li><code>pid_t getsid(pid_t pid);</code></li><li><code>pid_t setsid(void) ;</code></li></ul><h2 id="06-x2F-守护进程"><a href="#06-x2F-守护进程" class="headerlink" title="06 / 守护进程"></a>06 / 守护进程</h2><ul><li><p>守护进程 (Daemon Process)也就是通常说的 Daemon 进程 (精灵进程)，是Linux 中的后台服务进程。它是一个生存期较长的进程，通常独立于控制终端并且周期性地执行某种任务或等待处理某些发生的事件。一般采用以 d 结尾的名字。</p></li><li><p>守护进程具备下列特征：<br>          生命周期很长，守护进程会在系统启动的时候被创建并一直运行直至系统被关闭。<br>​ 它在后台运行并且不拥有控制终端。没有控制终端确保了内核永远不会为守护进程自动生成任何控制信号以及终端相关的信号 (如 <code>SIGINT、SIGQUIT</code>)。</p></li><li><p>Linux 的大多数服务器就是用守护进程实现的。比如Internet 服务器inetd,web 服务器 httpd 等。</p></li></ul><h2 id="07-x2F-守护进程的创建步骤"><a href="#07-x2F-守护进程的创建步骤" class="headerlink" title="07 / 守护进程的创建步骤"></a>07 / 守护进程的创建步骤</h2><ul><li>执行一个 <code>fork()</code>，之后父进程退出，子进程继续执行。</li><li>子进程调用 <code>setsid()</code> 开启一个新会话。</li><li>清除进程的 <code>umask</code> 以确保当守护进程创建文件和目录时拥有所需的权限。</li><li>修改进程的当前工作目录，通常会改为根目录 <code>(/)</code>。</li><li>关闭守护进程从其父进程继承而来的所有打开着的文件描述符。</li><li>在关闭了文件描述符<code>0、1、2</code>之后，守护进程通常会开/<code>dev/null</code> 并使用<code>dup2 ()</code>使所有这些描述符指向这个设备。</li><li>核心业务逻辑。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>共享内存</title>
+      <link href="/2022/12/26/2022-12-26-gong-xiang-nei-cun/"/>
+      <url>/2022/12/26/2022-12-26-gong-xiang-nei-cun/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01共享内存"><a href="#01共享内存" class="headerlink" title="01共享内存"></a>01共享内存</h2><ul><li>共享内存允许两个或者多个进程共享物理内存的同一块区域 (通常被称为段) 。由于个共享内存段会称为一个进程用户空间的一部分，因此这种 IPC 机制无需内核介入。所有需要做的就是让一个进程将数据复制进共享内存中，并且这部分数据会对其他所有共享同一个段的进程可用。</li><li>与管道等要求发送进程将数据从用户空间的缓冲区复制进内核内存和接收进程将数据从内核内存复制进用户空间的缓冲区的做法相比，这种 IPC 技术的速度更快。</li></ul><h2 id="02-x2F-共享内存使用步骤"><a href="#02-x2F-共享内存使用步骤" class="headerlink" title="02 / 共享内存使用步骤"></a>02 / 共享内存使用步骤</h2><p>调用 <code>shmget()</code> 创建一个新共享内存段或取得一个既有共享内存段的标识符 (即由其他进程创建的共享内存段) 。这个调用将返回后续调用中需要用到的共享内存标识符。</p><p>使用 <code>shmat ()</code> 来附上共享内存段，即使该段成为调用进程的虚拟内存的一部分。</p><p>此刻在程序中可以像对待其他可用内存那样对待这个共享内存段。为引用这块共享内存程序需要使用由 <code>shmat ()</code> 调用返回的 <code>addr</code> 值，它是一个指向进程的虚拟地址空间中该共享内存段的起点的指针。</p><p>调用 <code>shmdt ()</code>来分离共享内存段。在这个调用之后，进程就无法再引用这块共享内存了。这一步是可选的，并且在进程终止时会自动完成这一步。</p><p>调用 <code>shmctl()</code> 来删除共享内存段。只有当当前所有附加内存段的进程都与之分离之后内存段才会销毁。只有一个进程需要执行这一步。</p><h2 id="03-x2F-共享内存操作函数"><a href="#03-x2F-共享内存操作函数" class="headerlink" title="03/ 共享内存操作函数"></a>03/ 共享内存操作函数</h2><ul><li><code>int shmget(key t key, size-t size, int shmflg);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230226161635645.png"></p><ul><li><code>void  *shmat(int shmid,const void  *shmaddr, int shmflg);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230226161753180.png"></p><ul><li><code>int shmdt(const void *shmaddr);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230226161839671.png"></p><ul><li><code>int shmctl(int shmid,int cmd, struct shmid_ds  *buf);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230226161913551.png"></p><ul><li><code>key_t ftok(const char *pathname, int proj_id);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230226161944844.png"></p><h3 id="问题1：操作系统如何知道一块共享内存被多少个进程关联？"><a href="#问题1：操作系统如何知道一块共享内存被多少个进程关联？" class="headerlink" title="问题1：操作系统如何知道一块共享内存被多少个进程关联？"></a>问题1：操作系统如何知道一块共享内存被多少个进程关联？</h3><p>  - 共享内存维护了一个结构体<code>struct shmid_ds</code> 这个结构体中有一个成员 <code>shm_nattch</code></p><p>  <code>- shm_nattach</code> 记录了关联的进程个数</p><h3 id="问题2：可不可以对共享内存进行多次删除-shmctl"><a href="#问题2：可不可以对共享内存进行多次删除-shmctl" class="headerlink" title="问题2：可不可以对共享内存进行多次删除 shmctl"></a>问题2：可不可以对共享内存进行多次删除 <code>shmctl</code></h3><p>  - 可以的</p><p>  - 因为<code>shmctl</code> 标记删除共享内存，不是直接删除</p><p>  - 什么时候真正删除呢?</p><p>​    当和共享内存关联的进程数为0的时候，就真正被删除</p><p>  - 当共享内存的<code>key</code>为0的时候，表示共享内存被标记删除了</p><p>​    如果一个进程和共享内存取消关联，那么这个进程就不能继续操作这个共享内存。也不能进行关联。</p><h3 id="共享内存和内存映射的区别"><a href="#共享内存和内存映射的区别" class="headerlink" title="共享内存和内存映射的区别"></a>共享内存和内存映射的区别</h3><ul><li><p>1.共享内存可以直接创建，内存映射需要磁盘文件（匿名映射除外）</p></li><li><p>2.共享内存效果更高</p></li><li><p>3.内存</p><p>   所有的进程操作的是同一块共享内存。</p><p> 内存映射：每个进程在自己的虚拟地址空间中有一个独立的内存。</p></li><li><p>4.数据安全</p><p> - 进程突然退出</p><pre><code>   共享内存还存在</code></pre></li></ul><p>  ​     内存映射区消失</p><p>  ​    - 运行进程的电脑死机，宕机了</p><pre><code>      数据存在在共享内存中，没有了</code></pre><p>  ​        内存映射区的数据 ，由于磁盘文件中的数据还在，所以内存映射区的数据还存在。</p><ul><li><p>5.生命周期</p><p> - 内存映射区：进程退出，内存映射区销毁</p><p> - 共享内存：进程退出，共享内存还在，标记删除（所有的      关联 的进程数为0），或者关机</p><p> 如果一个进程退出，会自动和共享内存进行取消关联。</p></li></ul><h2 id="04-x2F-共享内存操作命令"><a href="#04-x2F-共享内存操作命令" class="headerlink" title="04 / 共享内存操作命令"></a>04 / 共享内存操作命令</h2><p><code>ipcs</code> 用法      </p><p><code>ipcs  -a</code>    打印当前系统中所有的进程间通信方式的信息</p><p><code>ipcs  -m</code>    打印出使用共享内存进行进程间通信的信息</p><p><code>ipcs  -q</code>    打印出使用消息队列进行进程间通信的信息</p><p><code>ipcs  -s</code>    打印出使用信号进行进程间通信的信息</p><p><code>ipcrm</code>  用法<br><code>ipcrm -M shmkey</code>    移除用<code>shmkey</code>创建的共享内存段</p><p><code>ipcrm -m shmid</code>      移除用<code>shmid</code>标识的共享内存段</p><p><code>ipcrm -Q msgkey</code>     移除用<code>msqkey</code>创建的消息队列</p><p><code>ipcm -q msqid</code>         移除用<code>msgid</code>标识的消息队列</p><p><code>ipcrm -S semkey</code>     移除用<code>semkey</code>创建的信号</p><p><code>ipcrm -s semid</code>       移除用<code>semid</code>标识的信号</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>进程间通信简介</title>
+      <link href="/2022/12/25/2022-12-25-jin-cheng-jian-tong-xin-jian-jie/"/>
+      <url>/2022/12/25/2022-12-25-jin-cheng-jian-tong-xin-jian-jie/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-信号的概念"><a href="#01-x2F-信号的概念" class="headerlink" title="01/信号的概念"></a>01/信号的概念</h2><ul><li>信号是 Linux进程间通信的最古老的方式之一，是事件发生时对进程的通知机制，有时也称之为软件中断，它是在软件层次上对中断机制的一种模拟，是一种异步通信的方式。信号可以导致一个正在运行的进程被另一个正在运行的异步进程中断，转而处理某一个突发事件。</li><li>发往进程的诸多信号，通常都是源于内核。引发内核为进程产生信号的各类事件如下：</li></ul><ol><li>对于前台进程，用户可以通过输入特殊的终端字符来给它发送信号。比如输入ctrl+C通常会给进程发送一个中断信号。</li><li>硬件发生异常，即硬件检测到一个错误条件并通知内核，随即再由内核发送相应信号给相关进程。比如执行一条异常的机器语言指令，诸如被 0 除，或者引用了无法访问的内存区域。</li><li>系统状态变化，比如 alarm 定时器到期将引起 SIGALRM 信号，进程执行的CPU时间超限，或者该进程的某个子进程退出。</li><li>运行kill命令或调用 kill 函数。</li></ol><ul><li><p>使用信号的两个主要目的是：</p><p>​让进程知道已经发生了一个特定的事情。</p><p>​强迫进程执行它自己代码中的信号处理程序。</p></li><li><p>信号的特点：</p><p>​简单</p><p>​不能携带大量信息</p><p>​满足某个特定条件才发送</p><p>​优先级比较高</p></li><li><p>查看系统定义的信号列表: kill -l </p></li><li><p>前 31 个信号为常规信号，其余为实时信号。</p></li></ul><h2 id="02-x2F-Linux信号一览表"><a href="#02-x2F-Linux信号一览表" class="headerlink" title="02/ Linux信号一览表"></a>02/ Linux信号一览表</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223152408083.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223152438390.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230308114032805.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223153845850.png"></p><h2 id="03-x2F-信号的5种默认处理动作"><a href="#03-x2F-信号的5种默认处理动作" class="headerlink" title="03/信号的5种默认处理动作"></a>03/信号的5种默认处理动作</h2><ul><li>查看信号的详细信息: <strong>man 7 signal</strong></li><li>信号的5中默认处理动作：<br><strong>Term</strong>  终止进程<br><strong>Ign</strong>     当前进程忽略掉这个信号<br><strong>Core</strong>  终止进程，并生成一个core文件<br><strong>Stop</strong>  暂停当前进程<br><strong>Cont</strong> 继续执行当前被暂停的进程<br>信号的几种状态:产生、未决、递达</li><li>SIGKILL 和SIGSTOP 信号不能被捕捉、阻塞或者忽略，只能执行默认动作</li></ul><h2 id="04-x2F-信号相关的函数"><a href="#04-x2F-信号相关的函数" class="headerlink" title="04/信号相关的函数"></a>04/信号相关的函数</h2><ul><li><p><code>int kill(pid_t pid,int sig);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223161324936.png"></p></li><li><p><code>int raise(int sig);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223161234692.png"></p></li><li><p><code>void abort(void);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223161344216.png"></p></li><li><p><code>unsigned int alarm(unsigned int seconds);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223161421275.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223161457216.png"></p></li><li><p><code>int setitimer(int which, const struct itimerval *new_val,struct itimerval *old_value);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223161654928.png"></p></li></ul><h2 id="05-x2F-信号捕捉函数"><a href="#05-x2F-信号捕捉函数" class="headerlink" title="05/信号捕捉函数"></a>05/信号捕捉函数</h2><ul><li><p><code>sighandler_t signal(int signum, sighandler_t handler);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223163157311.png"></p></li><li><p><code>int sigaction(int signum, const struct sigaction *act,struct sigaction *oldact);</code></p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230225175305931.png"></p><h2 id="06-x2F-信号集"><a href="#06-x2F-信号集" class="headerlink" title="06/ 信号集"></a>06/ 信号集</h2><ul><li>许多信号相关的系统调用都需要能表示一组不同的信号，多个信号可使用一个称之为信号集的数据结构来表示，其系统数据类型为 sigset _t。</li><li>在 PCB 中有两个非常重要的信号集。一个称之为“阻塞信号集”，另一个称之为“未决信号集”。这两个信号集都是内核使用位图机制来实现的。但操作系统不允许我们直接对这两个信号集进行位操作。而需自定义另外一个集合，借助信号集操作函数来对 PCB 中的这两个信号集进行修改。</li><li>信号的“未决”是一种状态，指的是从信号的产生到信号被处理前的这一段时间。</li><li>信号的“阻塞”是一个开关动作，指的是阻止信号被处理，但不是阻止信号产生信号的阻塞就是让系统暂时保留信号留待以后发送。由于另外有办法让系统忽略信号所以一般情况下信号的阻塞只是暂时的，只是为了防止信号打断敏感的操作。</li></ul><h2 id="07-x2F-阻塞信号集和未决信号集"><a href="#07-x2F-阻塞信号集和未决信号集" class="headerlink" title="07/阻塞信号集和未决信号集"></a>07/阻塞信号集和未决信号集</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230224190945.png"></p><p>1.用户通过键盘  Ctrl + C, 产生2号信号SIGINT (信号被创建)</p><p>2.信号产生但是没有被处理 （未决）<br>    - 在内核中将所有的没有被处理的信号存储在一个集合中 （未决信号集）<br>        - SIGINT信号状态被存储在第二个标志位上<br>        - 这个标志位的值为0， 说明信号不是未决状态<br>        - 这个标志位的值为1， 说明信号处于未决状态</p><p>3.这个未决状态的信号，需要被处理，处理之前需要和另一个信号集（阻塞信号集），进行比较</p><ul><li>阻塞信号集默认不阻塞任何的信号</li><li>如果想要阻塞某些信号需要用户调用系统的API</li></ul><p>4.在处理的时候和阻塞信号集中的标志位进行查询，看是不是对该信号设置阻塞了</p><ul><li>如果没有阻塞，这个信号就被处理</li><li>如果阻塞了，这个信号就继续处于未决状态，直到阻塞解除，这个信号就被处理</li></ul><h2 id="08-x2F-信号集相关的函数"><a href="#08-x2F-信号集相关的函数" class="headerlink" title="08/ 信号集相关的函数"></a>08/ 信号集相关的函数</h2><ul><li><p><code>int sigemptyset(sigset_t   *set);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230224193045997.png"></p></li><li><p><code>int sigfillset(sigset_t   *set);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230224193145040.png"></p></li><li><p><code>int sigaddset(sigset_t  *set, int signum);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230224193207015.png"></p></li><li><p><code>int sigdelset(sigset_t  *set, int signum);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230224193236235.png"></p></li><li><p><code>int sigismember(const sigset_t  *set, int signum);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230224193313610.png"></p></li><li><p><code>int sigprocmask(int how, const sigset_t  *set, sigset_t  *oldset);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230224194706.png"></p></li><li><p><code>int sigpending(sigset_t  *set);</code></p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230225174806920.png"></p><h2 id="09-x2F-内核实现信号捕捉的过程"><a href="#09-x2F-内核实现信号捕捉的过程" class="headerlink" title="09/内核实现信号捕捉的过程"></a>09/内核实现信号捕捉的过程</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230225190310501.png"></p><h2 id="10-x2F-SIGCHLD-信号"><a href="#10-x2F-SIGCHLD-信号" class="headerlink" title="10/ SIGCHLD 信号"></a>10/ SIGCHLD 信号</h2><ul><li>SIGCHLD信号产生的条件<br>子进程终止时<br>子进程接收到 SIGSTOP 信号停止时<br>子进程处在停止态，接受到SIGCONT后唤醒时</li><li>以上三种条件都会给父进程发送 SIGCHLD 信号，进程默认会忽略该信号</li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230226105803740.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>进程间通信简介</title>
+      <link href="/2022/12/24/2022-12-24-jin-cheng-jian-tong-xin-jian-jie/"/>
+      <url>/2022/12/24/2022-12-24-jin-cheng-jian-tong-xin-jian-jie/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01进程间通讯概念"><a href="#01进程间通讯概念" class="headerlink" title="01进程间通讯概念"></a>01进程间通讯概念</h2><ul><li>进程是一个独立的资源分配单元，不同进程 (这里所说的进程通常指的是用户进程)之间的资源是独立的，没有关联，不能在一个进程中直接访问另一个进程的资源。</li><li>但是，进程不是孤立的，不同的进程需要进行信息的交互和状态的传递等，因此需要进程间通信( IPC: Inter Processes Communication )。</li><li>进程间通信的目的:</li></ul><ol><li>数据传输:一个进程需要将它的数据发送给另一个进程。</li><li>通知事件:一个进程需要向另一个或一组进程发送消息，通知它 (它们)发生了某种事件(如进程终止时要通知父进程)。</li><li>资源共享:多个进程之间共享同样的资源。为了做到这一点，需要内核提供互斥和同步机制。</li><li>进程控制:有些进程希望完全控制另一个进程的执行(如 Debug 进程)，此时控制进程希望能够拦截另一个进程的所有陷入和异常，并能够及时知道它的状态改变。</li></ol><h2 id="02-x2F-linux进程间通信的方式"><a href="#02-x2F-linux进程间通信的方式" class="headerlink" title="02/ linux进程间通信的方式"></a>02/ linux进程间通信的方式</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230222184922678.png"></p><h2 id="03-x2F-匿名管道"><a href="#03-x2F-匿名管道" class="headerlink" title="03/匿名管道"></a>03/匿名管道</h2><p>管道也叫无名 (匿名)管道，它是 UNIX 系统 IPC(进程间通信)的最古老形式，所有的 UNIX系统都支持这种通信机制。</p><p>统计一个目录中文件的数目命令: ls | wc -l，为了执行该命令，shell创建了两个进程来分别执行 ls 和 wc。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230222185336159.png"></p><h2 id="04-x2F-管道的特点"><a href="#04-x2F-管道的特点" class="headerlink" title="04/管道的特点"></a>04/管道的特点</h2><ul><li><p>在管道中的数据的传递方向是单向的，一端用于写入，一端用于读取，管道是半双工的。</p></li><li><p>从管道读数据是一次性操作，数据一旦被读走，它就从管道中被抛弃，释放空间以便写更多的数据，在管道中无法使用 lseek() 来随机的访问数据。<br>匿名管道只能在具有公共祖先的进程 (父进程与子进程，或者两个兄弟进程，具有亲缘关系)之间使用。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230222185817848.png"></p></li></ul><h2 id="05-x2F-为什么可以使用管道进行进程间通信"><a href="#05-x2F-为什么可以使用管道进行进程间通信" class="headerlink" title="05/为什么可以使用管道进行进程间通信"></a>05/为什么可以使用管道进行进程间通信</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230222190031044.png"></p><h2 id="06-x2F-管道的数据结构"><a href="#06-x2F-管道的数据结构" class="headerlink" title="06/管道的数据结构"></a>06/管道的数据结构</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230222190117076.png"></p><h2 id="07-x2F-匿名管道的使用"><a href="#07-x2F-匿名管道的使用" class="headerlink" title="07/匿名管道的使用"></a>07/匿名管道的使用</h2><ul><li>创建匿名管道<br>``#include &lt;unistd.h&gt;<code> int pipe(int pipefd[2]);</code></li><li>查看管道缓冲大小命令<br><code>ulimit -a</code></li><li>查看管道缓冲大小函数<br>``#include &lt;unistd.h&gt;<code> long fpathconf(int fd, int name);</code></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230222190317.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20230222190521.png"></p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>读管道:<br>管道中有数据，<code>read</code>返回实际读到的字节数。</p><p>管道中无数据:<br>写端被全部关闭，<code>read</code>返回0(相当于读到文件的末尾)</p><p>写端没有完全关闭，<code>read</code>阻塞等待</p><p>写管道:</p><p>管道读端全部被关闭，进程异常终止 (进程收到SIGPIPE信号)</p><p>管道读端没有全部关闭:</p><p>管道已满，<code>write</code>阻塞</p><p>管道没有满，<code>write</code>将数据写入，并返回实际写入的字节数</p><h2 id="08-x2F-有名管道"><a href="#08-x2F-有名管道" class="headerlink" title="08/有名管道"></a>08/有名管道</h2><ul><li>匿名管道，由于没有名字，只能用于亲缘关系的进程间通信。为了克服这个缺点，提出了有名管道 (FIFO) ，也叫命名管道、FIFO文件。</li><li>有名管道 (FIFO)不同于匿名管道之处在于它提供了一个路径名与之关联，以 FIFO的文件形式存在于文件系统中，并且其打开方式与打开一个普通文件是一样的，这样即使与 FIFO的创建进程不存在亲缘关系的进程，只要可以访问该路径，就能够彼此通过 FIFO相互通信，因此，通过 FTFO不相关的进程也能交换数据。</li><li>一旦打开了 FIFO，就能在它上面使用与操作匿名管道和其他文件的系统调用一样的I/0系统调用了 (如<code>read()、write()</code>和<code>close()</code>) 。与管道一样，FIFO 也有一个写入端和读取端，并且从管道中读取数据的顺序与写入的顺序是一样的。FIFO 的名称也由此而来:先入先出。</li><li>有名管道 (FIFO)和匿名管道 (pipe) 有一些特点是相同的，不一样的地方在于:</li></ul><ol><li>FIFO 在文件系统中作为一个特殊文件存在，但 FIFO 中的内容却存放在内存中</li><li>当使用 FIFO的进程退出后，FIFO 文件将继续保存在文件系统中以便以后使用</li><li>FIFO 有名字，不相关的进程可以通过打开有名管道进行通信</li></ol><h2 id="09-x2F-有名管道的使用"><a href="#09-x2F-有名管道的使用" class="headerlink" title="09/有名管道的使用"></a>09/有名管道的使用</h2><ul><li><p>通过命令创建有名管道</p><p>​<code>mkfifo</code> 名字</p></li><li><p>通过函数创建有名管道</p><p>​<code>#include &lt;sys/types.h&gt;</code><br><code>​#include &lt;sys/stat.h&gt;</code><br><code>​int mkfifo(const char *pathname， mode_t mode);</code></p></li><li><p>一旦使用 <code>mkfifo</code> 创建了一个 FIFO，就可以使用 <code>open</code> 打开它，常见的文件I/0 函数都可用于 fifo。如: <code>close、read、write、unlink</code> 等。</p></li><li><p>FIFO 严格遵循先进先出 (First in First out)，对管道及 FIFO 的读总是从开始处返回数据，对它们的写则把数据添加到末尾。它们不支持诸如 lseek()等文件定位操作。</p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223111020116.png"></p><h2 id="10-x2F-内存映射"><a href="#10-x2F-内存映射" class="headerlink" title="10/内存映射"></a>10/内存映射</h2><p>内存映射 (Memory-mapped I/0) 是将磁盘文件的数据映射到内存，用户通过修改内存就能修改磁盘文件。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223111135513.png"></p><h2 id="11-x2F-内存映射相关系统调用"><a href="#11-x2F-内存映射相关系统调用" class="headerlink" title="11/内存映射相关系统调用"></a>11/内存映射相关系统调用</h2><ul><li><code>#include &lt;sys/mman.h&gt;</code></li><li><code>void *mmap(void *addr, size_t length, int prot,int flags,int fd, off_t offset);</code></li><li><code>int munmap(void *addr, size_t length)</code></li></ul><h2 id="12-x2F-思考问题"><a href="#12-x2F-思考问题" class="headerlink" title="12/思考问题"></a>12/思考问题</h2><ul><li><p>如果对<code>mmap</code>的返回值(ptr)做++操作(ptr++)，<code>munmap</code>是否能够成功?</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223113046006.png"></p></li><li><p>如果<code>ope</code>n时O RDONLY，<code>mmap</code>时<code>prot</code>参数指定<code>PROT READPROT WRITE</code>会怎样?</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223113109451.png"></p></li><li><p>如果文件偏移量为1000会怎样?</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223113130829.png"></p></li><li><p><code>mmap</code>什么情况下会调用失败?</p><p> <img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223113430551.png"></p></li><li><p>可以<code>open</code>的时候<code>O_CREAT</code>一个新文件来创建映射区吗?</p><p> <img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223113516148.png"></p></li><li><p><code>mmap</code>后关闭文件描述符，对<code>mmap</code>映射有没有影响?</p><p> <img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223113550596.png"></p></li><li><p>对ptr越界操作会怎样?</p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230223114415045.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>进程控制</title>
+      <link href="/2022/12/23/2022-12-23-jin-cheng-cao-zuo/"/>
+      <url>/2022/12/23/2022-12-23-jin-cheng-cao-zuo/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-进程退出"><a href="#01-x2F-进程退出" class="headerlink" title="01/进程退出"></a>01/进程退出</h2><ul><li><p><code>#include &lt;stdlib.h&gt;</code></p><p>​<code>void exit(int status);</code></p></li><li><p><code>#include &lt;unistd.h&gt;</code></p></li></ul><p>​<code>void_exit(int status);</code></p><p>参数<code>status</code>：是进程退出时的一个状态信息。父进程回收子进程资源的时候可以获取到。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230221095906062.png"></p><h2 id="02-x2F-孤儿进程"><a href="#02-x2F-孤儿进程" class="headerlink" title="02/孤儿进程"></a>02/孤儿进程</h2><ul><li>父进程运行结束，但子进程还在运行(未运行结束)，这样的子进程就称为孤儿进程（Orphan Process)。</li><li>每当出现一个孤儿进程的时候，内核就把孤儿进程的父进程设置为 init ，而 init进程会循环地 wait（） 它的已经退出的子进程。这样，当一个孤儿进程凄凉地结束了其生命周期的时候，init 进程就会代表党和政府出面处理它的一切善后工作。</li><li>因此孤儿进程并不会有什么危害。</li></ul><h2 id="03-x2F-僵尸进程"><a href="#03-x2F-僵尸进程" class="headerlink" title="03/僵尸进程"></a>03/僵尸进程</h2><ul><li>每个进程结束之后，都会释放自己地址空间中的用户区数据，内核区的 PCB 没有办法自己释放掉，需要父进程去释放。</li><li>进程终止时，父进程尚未回收，子进程残留资源 (PCB) 存放于内核中，变成僵尸(Zombie)进程。</li><li>僵尸进程不能被 <code>kil1 -9</code> 杀死</li><li>这样就会导致一个问题，如果父进程不调用 <code>wait()</code> 或 <code>waitpid()</code> 的话，那么保留的那段信息就不会释放，其进程号就会一直被占用，但是系统所能使用的进程号是有限的，如果大量的产生僵尸进程，将因为没有可用的进程号而导致系统不能产生新的进程，此即为僵尸进程的危害，应当避免。</li></ul><h2 id="04-x2F-进程回收"><a href="#04-x2F-进程回收" class="headerlink" title="04/进程回收"></a>04/进程回收</h2><p>在每个进程退出的时候，内核释放该进程所有的资源、包括打开的文件、占用的内存等。但是仍然为其保留一定的信息，这些信息主要主要指进程控制块PCB的信息(包括进程号、退出状态、运行时间等)。</p><p>父进程可以通过调用<code>wai</code>t或<code>waitpid</code>得到它的退出状态同时彻底清除掉这个进程。</p><p><code>wait()</code>和 <code>waitpid()</code> 函数的功能一样，区别在于，<code>wait()</code> 函数会阻塞，<code>waitpid()</code> 可以设置不阻塞，<code>waitpid()</code> 还可以指定等待哪个子进程结束。</p><p>注意:一次<code>wait</code>或<code>waitpid</code>调用只能清理一个子进程，清理多个子进程应使用循环。</p><h3 id="04-x2F-退出信息相关宏函数"><a href="#04-x2F-退出信息相关宏函数" class="headerlink" title="04/退出信息相关宏函数"></a>04/退出信息相关宏函数</h3><ul><li><code>WIFEXITED(status)</code> 非0，进程正常退出。</li><li><code>WEXITSTATUS(status)</code>如果上宏为真，获取进程退出的状态 (<code>exit</code>的参数)。</li><li><code>WIFSIGNALED(status)</code> 非0，进程异常终止 。</li><li><code>WTERMSIG(status)</code> 如果上宏为真，获取使进程终止的信号编号。</li><li><code>WIFSTOPPED(status)</code> 非0，进程处于暂停状态。</li><li><code>WSTOPSIG(status)</code> 如果上宏为真，获取使进程暂停的信号的编号。</li><li><code>WIFCONTINUED(status)</code> 非0，进程暂停后已经继续运行。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>exec函数族</title>
+      <link href="/2022/12/22/2022-12-22-exec-han-shu-zu/"/>
+      <url>/2022/12/22/2022-12-22-exec-han-shu-zu/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-exec函数族介绍"><a href="#01-x2F-exec函数族介绍" class="headerlink" title="01/exec函数族介绍"></a>01/exec函数族介绍</h2><ul><li><code>exeC</code> 函数族的作用是根据指定的文生名找到可执行文件，并用它来取代调用进程的内容，换句话说，就是在调用进程内部执行一个可执行文件。</li><li><code>exec</code> 函数族的函数执行成功后不会返回，因为调用进程的实体，包括代码段，数据段和堆栈等都已经被新的内容取代，只留下进程 ID等一些表面上的信息仍保持原样，颇有些神似“三十六计”中的“金蝉脱壳”。看上去还是旧的躯壳，却已经注入了新的灵魂。只有调用失败了，它们才会返回 -1，从原程序的调用点接着往下执行。</li></ul><h2 id="02-x2F-exec函数族作用图解"><a href="#02-x2F-exec函数族作用图解" class="headerlink" title="02/exec函数族作用图解"></a>02/exec函数族作用图解</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230221090353167.png"></p><p>内核区没有发生改变，改变的是上述区域。</p><h2 id="03-x2F-exec-函数族"><a href="#03-x2F-exec-函数族" class="headerlink" title="03/exec 函数族"></a>03/exec 函数族</h2><ul><li><p><code>int execl(const char *path, const char *arg， .../ * (char *) NULL */);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230221091654665.png"></p></li><li><p><code>int execlp(const char *file, const char  *arg， ... / * (char *)  NULL */);</code></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230221094955674.png"></p></li><li><p><code>int execle(const char *path, const char  * arg ， .../* ,(char *) NULL， char * const envp[] */);</code></p></li><li><p><code>int execv(const char *path, char  *const  argv[]);</code></p></li><li><p><code>int execvp(const char *file, char *const argv[]);</code></p></li><li><p><code>int execvpe(const char *file，char *const argv[],char *const envp[]) ;</code></p></li><li><p><code>int execve(const char *filename, char *const argv[], char *const envp[]);</code></p></li></ul><p><code>l(list)</code>参数地址列表，以空指针结尾</p><p><code>v(vector)</code>          存有各参数地址的指针数组的地址</p><p><code>p（path）</code>按path环境变量指定的目录搜索可执行文件</p><p><code>e（enviroment）</code>存有环境变量字符地址的指针数组的地址</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>进程创建</title>
+      <link href="/2022/12/21/2022-12-21-fu-zi-jin-cheng-xu-ni-di-zhi-kong-jian-qing-kuang/"/>
+      <url>/2022/12/21/2022-12-21-fu-zi-jin-cheng-xu-ni-di-zhi-kong-jian-qing-kuang/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-进程创建"><a href="#01-x2F-进程创建" class="headerlink" title="01/进程创建"></a>01/进程创建</h2><p>系统允许一个进程创建新进程新进程即为子进程，，子进程还可以创建新的子进程，形成进程树结构模型。</p><p><code>#include &lt;sys/types.h&gt;</code></p><p><code>#include &lt;unistd.h&gt;</code></p><p><code>pid_t fork(void);</code></p><p>返回值<br>        成功:子进程中返回 0，父进程中返回子进程 ID。<br>        失败: 返回-1。</p><p>失败的两个主要原因:</p><ol><li>当前系统的进程数已经达到了系统规定的上限，这时 <code>errno</code> 的值被设置为 <code>EAGAIN</code>。</li><li>系统内存不足，这时 <code>errno</code> 的值被设置为 <code>ENOMEM</code></li></ol><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230220213225532.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230220214504785.png"></p><h2 id="02-x2F-父子进程虚拟空间"><a href="#02-x2F-父子进程虚拟空间" class="headerlink" title="02/父子进程虚拟空间"></a>02/父子进程虚拟空间</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230220213534927.png"></p><p><code>fork()</code>以后，子进程的用户区数据和父进程一样。内核区也会拷贝过来，但是 <code>pid</code>不一样。</p><p>实际上，更准确来说，Linux 的 <code>fork()</code> 使用是通过写时拷贝 (copy- on-write)实现的。 写时拷贝是一种可以推迟甚至避免拷贝数据的技术。</p><p>内核此时并不复制整个进程的地址空间，而是让父子进程共享同一个地址空间。只用在需要写入的时候才会复制地址空间，从而使各个进程拥有各自的地址空间。也就是说，资源的复制是在需要写入的时候才会进行，在此之前，只有以只读方式共享。</p><p>注意: <code>fork</code>之后父子进程共享文件，fork产生的子进程与父进程相同的文件文件描述符指向相同的文件表，引用计数增加，共享文件偏移指针。</p><h2 id="03-x2F-GDB多进程调试"><a href="#03-x2F-GDB多进程调试" class="headerlink" title="03/GDB多进程调试"></a>03/GDB多进程调试</h2><ul><li>使用 GDB 调试的时候，GDB 默认只能跟踪一个进程，可以在 <code>fork</code> 函数调用之前，通过指令设置GDB 调试工具跟踪父进程或者是跟踪子进程，默认跟踪父进程。</li><li>设置调试父进程或者子进程: <code>set follow-fork-mode [parent (默认) | child]</code></li><li>设调试模式: <code>set detach-on-fork [on | off]</code>，默认为 <code>on</code>，表示调试当前进程的时候，其它的进程继续运行，如果为 <code>off</code>，调试当前进程的时候，其它进程被 GDB 挂起。</li><li>查看调试的进程: <code>info inferiors</code></li><li>切换当前调试的进程: <code>inferior id</code></li><li>使进程脱离 GDB 调试: <code>detach inferiors id</code></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>进程状态转化</title>
+      <link href="/2022/12/21/2022-12-21-jin-cheng-zhuang-tai-zhuan-hua/"/>
+      <url>/2022/12/21/2022-12-21-jin-cheng-zhuang-tai-zhuan-hua/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-进程的状态"><a href="#01-x2F-进程的状态" class="headerlink" title="01/进程的状态"></a>01/进程的状态</h2><p>进程状态反映进程执行过程的变化。这些状态随着进程的执行和外界条件的变化而转换。在三态模型中，进程状态分为三个基本状态，即就绪态，运行态，阻塞态。在五态模型中，进程分为新建态、就绪态，运行态，阻塞态，终止态。</p><ul><li>运行态:进程占有处理器正在运行。</li><li>就绪态:进程具备运行条件，等待系统分配处理器以便运行。当进程已分配到除CPU以外的所有必要资源后，只要再获得CPU，便可立即执行。在一个系统中处于就绪状态的进程可能有多个，通常将它们排成一个队列，称为就绪队列。</li><li>阻塞态: 又称为等待(<code>wait</code>)态或睡眠(<code>sleep</code>)态，指进程不具备运行条件，正在等待某个事件的完成。</li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230220203348724.png"></p><p>新建态:进程刚被创建时的状态，尚未进入就绪队列。</p><p>终止态:进程完成任务到达正常结束点，或出现无法克服的错误而异常终止，或被操作系统及有终止权的进程所终止时所处的状态。进入终止态的进程以后不再执行，但依然保留在操作系统中等待善后。一旦其他进程完成了对终止态进程的信息抽取之后，操作系统将删除该进程。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230220203651052.png"></p><h2 id="02-x2F-进程相关命令"><a href="#02-x2F-进程相关命令" class="headerlink" title="02/进程相关命令"></a>02/进程相关命令</h2><ul><li><p>查看进程</p><p>​<code>ps aux / ajx</code></p><p>​a：显示终端上的所有进程，包括其他用户的进程<br>​u：显示进程的详细信息<br>​x：显示没有控制终端的进程<br>​i：列出与作业控制相关的信息</p></li><li><p>实时显示进程动态</p><p>​<code>top</code><br>​可以在使用 top 命令时加上 -d 来指定显示信息更新的时间间隔，在 top 命令执行后，可以按以下按键对显示的结果进行排序:<br>​M根据内存使用量排序<br>​P根据 CPU 占有率排序<br>​T根据进程运行时间长短排序<br>​U根据用户名来筛选进程<br>​K输入指定的PID杀死进程</p></li><li><p>杀死进程<br>    <code>kill [-signal]  pid</code><br>      <code>kill -1</code> 列出所有信号<br>      <code>kill -SIGKILL</code>  进程ID<br>      <code>kill -9</code> 进程ID<br>      <code>killall name</code> 根据进程名杀死进程</p></li></ul><h2 id="03-x2F-进程号和相关函数"><a href="#03-x2F-进程号和相关函数" class="headerlink" title="03/进程号和相关函数"></a>03/进程号和相关函数</h2><ul><li>每个进程都由进程号来标识，其类型为 pid_t(整型)，进程号的范围:0~32767。进程号总是唯一的，但可以重用。当一个进程终止后，其进程号就可以再次使用。</li><li>任何进程(除 init 进程)都是由另一个进程创建，该进程称为被创建进程的父进程对应的进程号称为父进程号 (PPID)。</li><li>进程组是一个或多个进程的集合。他们之间相互关联，进程组可以接收同一终端的各种信号，关联的进程有一个进程组号 PGID)。默认情况下，当前的进程号会当做当前的进程组号。</li><li>进程号和进程组相关函数:</li></ul><p>​<code>pid_t getpid(void);</code><br><code>​pid_t getppid(void);</code><br><code>​pid_t getpgid(pid_t pid);</code></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>进程概述</title>
+      <link href="/2022/12/20/2022-12-20-jin-cheng-gai-shu/"/>
+      <url>/2022/12/20/2022-12-20-jin-cheng-gai-shu/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-程序和进程"><a href="#01-x2F-程序和进程" class="headerlink" title="01/程序和进程"></a>01/程序和进程</h2><ul><li>程序是包含一系列信息的文件，这些信息描述了如何在运行时创建一个进程：</li><li>二进制格式标识: 每个程序文件都包含用于描述可执行文件格式的元信息。内核利用此信息来解释文件中的其他信息。 (ELE可执行连接格式)。</li><li>机器语言指令:对程序算法进行编码。</li><li>程序入口地址: 标识程序开始执行时的起始指令位置。</li><li>数据: 程序文件包含的变量初始值和程序使用的字面量值 (比如字符串)。</li><li>符号表及重定位表: 描述程序中函数和变量的位置及名称。这些表格有多重用途，其中包括调试和运行时的符号解析(动态链接)。</li><li>共享库和动态链接信息: 程序文件所包含的一些字段，列出了程序运行时需要使用的共享库，以及加载共享库的动态连接器的路径名。</li><li>其他信息:程序文件还包含许多其他信息，用以描述如何创建进程。</li></ul><h2 id="02-x2F-单道、多道程序设计"><a href="#02-x2F-单道、多道程序设计" class="headerlink" title="02/ 单道、多道程序设计"></a>02/ 单道、多道程序设计</h2><ul><li>单道程序，即在计算机内存中只允许一个的程序运行。</li><li>多道程序设计技术是在计算机内存中同时存放几道相互独立的程序，使它们在管理程序控制下，相互穿插运行，两个或两个以上程序在计算机系统中同处于开始到结束之间的状态，这些程序共享计算机系统资源。引入多道程序设计技术的根本目的是为了提高 CPU的利用率。</li><li>对于一个单 CPU 系统来说，程序同时处于运行状态只是一种宏观上的概念，他们虽然都已经开始运行，但就微观而言，任意时刻，CPU 上运行的程序只有一个。在多道程序设计模型中，多个进程轮流使用 CPU。而当下常见 CPU 为纳秒级，1秒可以执行大约 10 亿条指令。由于人眼的反应速度是毫秒级，所以看似同时在运行。</li></ul><h2 id="03-x2F-时间片"><a href="#03-x2F-时间片" class="headerlink" title="03/时间片"></a>03/时间片</h2><ul><li>时间片 (timeslice) 又称为“量子 (quantum)“或“处理器片 (processor slice)“，是操作系统分配给每个正在运行的进程微观上的一段 CPU 时间。事实上，虽然一台计算机通常可能有多个 CPU，但是同一个 CPU 永远不可能真正地同时运行多个任务。在只考虑一个 CPU 的情况下，这些进程“看起来像”同时运行的，实则是轮番穿插地运行由于时间片通常很短 (在 Linux 上为 5ms-800ms)，用户不会感觉到。</li><li>时间片由操作系统内核的调度程序分配给每个进程。首先，内核会给每个进程分配相等的初始时间片，然后每个进程轮番地执行相应的时间，当所有进程都处于时间片耗尽的状态时，内核会重新为每个进程计算并分配时间片，如此往复。</li></ul><h2 id="04-x2F-并行和并发"><a href="#04-x2F-并行和并发" class="headerlink" title="04/并行和并发"></a>04/并行和并发</h2><ul><li><p>并行(parallel): 指在同一时刻，有多条指令在多个处理器上同时执行。</p></li><li><p>并发(concurrency): 指在同一时刻只能有一条指令执行，但多个进程指令被快速的轮换执行，使得在宏观上具有多个进程同时执行的效果，但在微观上并不是同时执行的只是把时间分成若干段，使多个进程快速交替的执行。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230220200742872.png"></p><p>并发是两个队列交替使用一台咖啡机。</p><p>并行是两个队列同时使用两台咖啡机。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230220201025669.png"></p></li></ul><h2 id="05-x2F-进程控制块-PCB"><a href="#05-x2F-进程控制块-PCB" class="headerlink" title="05/进程控制块(PCB)"></a>05/进程控制块(PCB)</h2><ul><li>为了管理进程，内核必须对每个进程所做的事情进行清楚的描述。内核为每个进程分配一个 PCB(Processing Control Block)进程控制块，维护进程相关的信息，Linux 内核的进程控制块是 task_struct 结构体。</li><li>在 /usr/src/linux-headers-xxx/include/linux/sched.h 文件中可以查看 struct task_struct 结构体定义。其内部成员有很多，我们只需要掌握以下部分即可:</li></ul><ol><li>进程id:系统中每个进程有唯一的 id，用 pid_t类型表示，其实就是一个非负整数。</li><li>进程的状态:有就绪、运行、挂起、停止等状态。</li><li>进程切换时需要保存和恢复的一些CPU寄存器。</li><li>描述虚拟地址空间的信息。</li><li>描述控制终端的信息。</li><li>当前工作目录 (Current Working Directory）。</li><li>umask 掩码。</li><li>文件描述符表，包含很多指向 file 结构体的指针。</li><li>和信号相关的信息。</li><li>用户 id 和组 id。</li><li>会话 (Session) 和进程组。</li><li>进程可以使用的资源上限 (Resource Limit)。</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux多进程开发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>linux中文件属性和目录操作函数</title>
+      <link href="/2022/12/17/2022-12-17-linux-zhong-wen-jian-shu-xing-cao-zuo-han-shu/"/>
+      <url>/2022/12/17/2022-12-17-linux-zhong-wen-jian-shu-xing-cao-zuo-han-shu/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-文件属性操作函数"><a href="#01-x2F-文件属性操作函数" class="headerlink" title="01/文件属性操作函数"></a>01/文件属性操作函数</h2><ul><li><p><strong>int access(const char <em>pathname, int mode);</em></strong></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217113208068.png"></p></li><li><p><strong>int chmod(const char <em>filename, int mode);</em></strong></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217112923398.png"></p></li><li><p><strong>int chown(const char <em>path, uid_t owner, gid_t group);</em></strong></p></li><li><p><strong>int truncate(const char <em>path, off_t length);</em></strong></p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217115905367.png"></p><h2 id="02-x2F-目录操作函数"><a href="#02-x2F-目录操作函数" class="headerlink" title="02/目录操作函数"></a>02/目录操作函数</h2><ul><li><p>*<em>int mkdir(const char <em>pathname, mode_t mode);</em></em></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217141841083.png"></p></li><li><p>*<em>int rmdir(const char <em>pathname);</em></em></p></li><li><p>**int rename(const char <em>oldpath, const char <em>newpath);</em></em></p></li><li><p>*<em>int chdir(const char <em>path);</em></em></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217143137414.png"></p></li><li><p>**char <em>getcwd(char <em>buf, size t size);</em></em></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217143833935.png"></p></li></ul><h2 id="03-x2F-目录遍历函数"><a href="#03-x2F-目录遍历函数" class="headerlink" title="03/目录遍历函数"></a>03/目录遍历函数</h2><p>**DIR <em>opendir（condst char <em>name)；</em></em></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217145236255.png"></p><p>**struct dirent <em>readdir（DIR <em>dirp);</em></em></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217150127694.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217145637584.png"></p><p>*<em>int closedir(DIR <em>dirp)；</em></em></p><h2 id="04-x2F-dup、dup2函数"><a href="#04-x2F-dup、dup2函数" class="headerlink" title="04/ dup、dup2函数"></a>04/ dup、dup2函数</h2><ul><li><p><strong>int dup(int oldfd);</strong></p><p>复制文件描述符</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230219192000170.png"></p></li><li><p><strong>int dup2(int oldfd,int newfd);</strong></p><p>重新定向文件描述符</p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230219192738574.png"></p><p>05/ fcntl 函数</p><ul><li><strong>int fcntl(int fd, int cmd, … /* arg */);</strong></li></ul><p>复制文件描述符</p><p>设置/获取文件的状态标志</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230219202634131.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230219203421017.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 文件属性操作 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>标准c库IO函数和Linux系统IO函数对比</title>
+      <link href="/2022/12/14/2022-12-04-biao-zhun-c-ku-io-han-shu-he-linux-xi-tong-io-han-shu-dui-bi/"/>
+      <url>/2022/12/14/2022-12-04-biao-zhun-c-ku-io-han-shu-he-linux-xi-tong-io-han-shu-dui-bi/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-标准c库IO函数"><a href="#01-x2F-标准c库IO函数" class="headerlink" title="01/标准c库IO函数"></a>01/标准c库IO函数</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230214142530628.png"></p><h2 id="02-x2F-标准c库IO和Linux系统IO的关系"><a href="#02-x2F-标准c库IO和Linux系统IO的关系" class="headerlink" title="02/标准c库IO和Linux系统IO的关系"></a>02/标准c库IO和Linux系统IO的关系</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230214144837666.png"></p><h2 id="03-x2F-linux系统中的IO函数"><a href="#03-x2F-linux系统中的IO函数" class="headerlink" title="03/linux系统中的IO函数"></a>03/linux系统中的IO函数</h2><ul><li><p>*<em>int  open(const char <em>pathname, int flags);</em></em></p><p>linux中的IO函数可以在第二章节找到：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215110602427.png"></p><p>函数信息及需要的头文件如下：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215110712908.png"></p><p>需要注意的是;</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215110436723.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215111711168.png"></p><p>比如运行以下代码：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215111835273.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215112014792.png"></p></li><li><p>**int open(const char *pathname, int flags，mode_t mode);**（可以创建新的文件）</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215115604802.png"></p></li><li><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230215115732197.png"></p><p>mode值与umask按位与得到的才是创建的文件最终的权限，文件umask的值可以自己设置，只在当前终端有用。</p></li><li><p><strong>int close(int  fd);</strong></p></li><li><p>*<em>ssize_t read(int fd, void <em>buf, size_t count);</em></em></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230216151625059.png"></p></li><li><p>*<em>ssize_t write(int fd, const void <em>buf,size_t count)；</em></em></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230216152032263.png"></p><p>读写函数实现文件拷贝代码示例：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230216160004826.png"></p></li><li><p><strong>off_t lseek(int fd, off_t offset, int whence);</strong></p></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230216162639202.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230216163607979.png"></p><ul><li>**int stat(const char <em>oathname,struct stat <em>statbuf)</em></em></li></ul><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217103408020.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217103701104.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217104423446.png"></p><ul><li><p>**int lstat(const char *pathname, struct stat *statbuf)**<strong>（用来获取软链接文件信息）</strong></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230217105702314.png"></p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> IO函数对比 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>计算机网络中的物理层</title>
+      <link href="/2022/12/13/2023-12-13-ji-suan-ji-wang-luo-zhong-de-wu-li-ceng/"/>
+      <url>/2022/12/13/2023-12-13-ji-suan-ji-wang-luo-zhong-de-wu-li-ceng/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="计算机网络中的物理层"><a href="#计算机网络中的物理层" class="headerlink" title="计算机网络中的物理层"></a>计算机网络中的物理层</h1><ul><li><h2 id="物理层的基本概念"><a href="#物理层的基本概念" class="headerlink" title="物理层的基本概念"></a>物理层的基本概念</h2><h3 id="物理层所要解决的问题："><a href="#物理层所要解决的问题：" class="headerlink" title="物理层所要解决的问题："></a>物理层所要解决的问题：</h3><p>物理层考虑的是怎样才能在连接各种计算机的传输媒体上传输数据比特流。<br>物理层为数据链路层屏蔽了各种传输媒体的差异，使数据链路层只需要考虑如何完成本层的协议和服务，而不必考虑网络具体的传输媒体是什么。</p><h3 id="物理层协议的主要任务："><a href="#物理层协议的主要任务：" class="headerlink" title="物理层协议的主要任务："></a>物理层协议的主要任务：</h3><p>机械特性：指明接口所用接线器的形状和尺寸引脚数目和排列、周定和锁定装置。</p><p>电气特性：指明在接口电缆的各条线上出现的电压的范围。</p><p>功能特性：指明某条线上出现的某一电平的电压表示何种意义。</p><p>过程特性：指明对于不同功能的各种可能事件的出现顺序。</p></li><li><h2 id="物理层下边的传输媒体"><a href="#物理层下边的传输媒体" class="headerlink" title="物理层下边的传输媒体"></a>物理层下边的传输媒体</h2><p>导引型传输媒体：同轴电缆、双绞线、光纤、电力线</p><p>非导引型传输媒体：无线电波、微波、红外线、可见光</p></li><li><h2 id="传输方式"><a href="#传输方式" class="headerlink" title="传输方式"></a>传输方式</h2><p>串行传输和并行传输、同步传输和异步传输、单工、半双工以及全双工传输</p></li><li><h2 id="编码与调制"><a href="#编码与调制" class="headerlink" title="编码与调制"></a>编码与调制</h2><p>编码：数字信号转换为另一种数字信号，在数字信道中传输；模拟信号转换为数字信号在数字信道中传输。</p><p>常用的编码方式：不归零编码、归零编码、曼切斯特编码、差分曼切斯特编码。</p><p>调制：数字信号转换为模拟信号，在模拟信道中传输；模拟信号转换为另一种模拟信号，在模拟信道中传输。</p><p>基本调制（二元制）、混合调制（多元制）：调幅、调频、调相。</p><p>码元：在使用时间域的波形表示教字信号时，代表不同高散数值的基本波形。简单来说，码元就是一段调制好的基本波形，可以表示比特信息。</p></li><li><h2 id="信道的极限容量"><a href="#信道的极限容量" class="headerlink" title="信道的极限容量"></a>信道的极限容量</h2><p>造成信号失真的因素：码元传输速率、信号传输距离、噪声干扰、传输媒体质量。</p><p>奈氏准则：在假定的理想条件下，为了避免码间串扰，码元传输速率是有上限的。理想低通信道的最高码元传输速率=2W Baud = 2W码元/秒；理想带通信道的最高码元传输速率=W Baud = W 码元/秒</p><p>波特率与比特率的关系：</p><p>码元传输速率又称为波特率、调制速率、波形速率或符号速率。它与比特率有一定的关系。</p><p>当1个码元只携带1比特的信息量时波特率(码元/秒)与比特率(比特/秒)在数值上时相等的。</p><p>当1个码元携带n比特的信息量时，则波特率转换成比特率时，数值要乘以n。</p><p>香农公式：c = W x log2(1 + S/N)</p><p>c:信道的极限信息传输速率 (单位为b/s)<br>w:信道带竞(单位为Hz)</p><p>s: 信道内所传输信号的平均功率</p><p>N:信道内的高斯峰声功率</p><p>S/N:信噪比，便用分贝 (dB) 作为度量单位。信噪比(dB) = 10 xlog1(S/N)(dB)</p><p>奈氏准则和香农公式的意义：</p><p>在信道带宽一定的情况下，根据奈氏准则和香农公式，要想提高信息的传输速率就必须采用多元制(更好的调制方法)和努力提高信道中的信噪比。<br>自从香农公式发表后，各种新的信号处理和调制方法就不断出现，其目的都是为了尽可能地接近舌农公式给出的传输速率极限  。</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网络中的物理层 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>GDB调试</title>
+      <link href="/2022/12/13/2022-12-13-gdb-diao-shi/"/>
+      <url>/2022/12/13/2022-12-13-gdb-diao-shi/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="01-x2F-什么是GDB"><a href="#01-x2F-什么是GDB" class="headerlink" title="01/ 什么是GDB"></a>01/ 什么是GDB</h2><ul><li>GDB是由GUN软件系统社区提供的调试工具，同GCC配套组成了一套完整的开发环境，GBD是linux和许多类Unix系统中的标准开发环境。</li><li>一般来说，GDB主要帮助你完成下面四个方面的功能：</li></ul><ol><li>启动程序，可以按照自定义的要求随心所欲的运行程序</li><li>可让被调试的程序在所指定的调试的断点处停住（断点可以是条件表达式）</li><li>当程序被停住时，可以检查此时程序中所发生的事</li><li>可以改变程序，将一个BUG产生的影响修正从而测试其他BUG</li></ol><h2 id="02-x2F-准备工作"><a href="#02-x2F-准备工作" class="headerlink" title="02/准备工作"></a>02/准备工作</h2><ul><li>通常，在为调试而编译时，我们会 ()关掉编译器的优化选项 (<em>-o</em>)，并打开调试选项 (<em>-g</em>)。另外，-wall在尽量不影响程序行为的情况下选项打开所有<em>warning</em>，也可以发现许多问题，避免一些不必要的 BUG。</li><li><em>gcc -g  -Wall  program.c  -o  program</em></li><li><em>-g</em>选项的作用是在可执行文件中加入源代码的信息，比如可执行文件中第几条机器指令对应源代码的第几行，但并不是把整个源文件嵌入到可执行文件中，所以在调试时必须保证 gdb 找到源文件。</li></ul><h2 id="03-x2F-GDB命令-启动、退出、查看代码"><a href="#03-x2F-GDB命令-启动、退出、查看代码" class="headerlink" title="03/GDB命令-启动、退出、查看代码"></a>03/GDB命令-启动、退出、查看代码</h2><ul><li><p>启动和退出</p><p>gdb 可执行程序</p><p>quit</p></li><li><p>给程序设置参数/获取设置参数</p><p>set args 10 20 </p><p>show args</p></li><li><p>GDB使用帮助</p><p>help</p></li><li><p>查看当前文件代码</p><p>list/l  (从默认位置显示)</p><p>list/l  行号 （从指定位置显示）</p><p>list/l  函数名（从指定的函数显示）</p></li><li><p>查看非当前文件代码</p><p>list/l  文件名：行号</p><p>list/l  文件名：函数名</p></li><li><p>设置显示的函数</p></li></ul><p>​      show list/listsize</p><p>​      set  list/listsize  行数</p><h2 id="04-x2F-GDB命令-断点操作"><a href="#04-x2F-GDB命令-断点操作" class="headerlink" title="04/ GDB命令-断点操作"></a>04/ GDB命令-断点操作</h2><ul><li><p>设置断点</p><p>b/break 行号</p><p>b/break 函数名</p><p>b/break 文件名：行号</p><p>b/break 文件名：函数</p></li><li><p>查看断点</p><p>i/info b/break</p></li><li><p>删除断点</p><p>d/del/delete 断点编号</p></li><li><p>设置断点无效</p><p>dis/disable 断点编号</p></li><li><p>设置断点生效</p><p>ena/enable 断点编号</p></li><li><p>设置条件断点（一般用在循环位置）</p><p>b/break 10 if i==5</p></li></ul><h2 id="05-x2F-GDB-命令-调试命令"><a href="#05-x2F-GDB-命令-调试命令" class="headerlink" title="05/ GDB 命令-调试命令"></a>05/ GDB 命令-调试命令</h2><ul><li><p>运行GDB程序</p><p>start（程序停在第一行）</p><p>run（遇到断点才停）</p></li><li><p>继续运行，到下一个断点停止</p><p>c/continue</p></li><li><p>向下执行一行代码（不会进入函数体）</p><p>n/next</p></li><li><p>变量操作</p><p>p/print  变量名（打印变量值）</p><p>ptype 变量名（打印变量类型）</p></li><li><p>向下单步调试</p><p>s/step</p><p>finish（跳出函数体）</p></li><li><p>自动变量操作</p><p>display num（自动打印指定变量的值）</p><p>i/info display</p><p>undispiay 编号</p></li><li><p>其他操作</p><p>set var 变量名=变量值</p><p>until （跳出循环）</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> GDB </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>衡量计算机网络性能的八个指标</title>
+      <link href="/2022/12/12/2022-12-12-heng-liang-ji-suan-ji-wang-luo-xing-neng-de-ba-ge-zhi-biao/"/>
+      <url>/2022/12/12/2022-12-12-heng-liang-ji-suan-ji-wang-luo-xing-neng-de-ba-ge-zhi-biao/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="衡量计算机网络性能的八个指标"><a href="#衡量计算机网络性能的八个指标" class="headerlink" title="衡量计算机网络性能的八个指标"></a>衡量计算机网络性能的八个指标</h1><h2 id="速率、带宽、吞吐量、时延"><a href="#速率、带宽、吞吐量、时延" class="headerlink" title="速率、带宽、吞吐量、时延"></a>速率、带宽、吞吐量、时延</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230208173843502.png" alt="image-20230208173843502"></p><h2 id="时延带宽积、往返时间、利用率、丢包率"><a href="#时延带宽积、往返时间、利用率、丢包率" class="headerlink" title="时延带宽积、往返时间、利用率、丢包率"></a>时延带宽积、往返时间、利用率、丢包率</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20230208182300726.png" alt="image-20230208182300726"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>静态库、动态库的制作与使用</title>
+      <link href="/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/"/>
+      <url>/2022/12/02/ru-he-zhi-zuo-jing-tai-ku/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="什么是库？"><a href="#什么是库？" class="headerlink" title="什么是库？"></a>什么是库？</h2><ol><li>库文件是计算机上的一类文件， 可以简单的把库文件看成一种代码仓库，它提供给使用者可以直接拿来用的变量、函数或者类。</li><li>库是特殊的一种程序．编写库的程序和编写一般的程序区别不大，只是库不能单独运行。</li><li>库文件有两种，静态库和动态库（共享库)，区别是:静态库在程序的链接阶段被复制到了程序中;动态库在链接阶段没有被复制到程序中，而是程序在运行时由系统动态加载到内存中供程序调用。</li><li>库的好处: 1.代码保密   2.方便部署和分发</li></ol><h2 id="静态库的制作"><a href="#静态库的制作" class="headerlink" title="静态库的制作"></a>静态库的制作</h2><h3 id="命名规则："><a href="#命名规则：" class="headerlink" title="命名规则："></a>命名规则：</h3><p>linux：<strong>libxxx.a</strong>                                       </p><ul><li>lib：前缀，固定                                                                                                               </li><li>xxx：库的名字                                                                                                                                              </li><li>.a：后缀 固定</li></ul><p>windows：<strong>libxxx.lib</strong>                                                                                                                                                                        </p><h3 id="制作静态库："><a href="#制作静态库：" class="headerlink" title="制作静态库："></a>制作静态库：</h3><p>gcc获得.o文件                                                                          </p><p>将.o文件打包，使用ar工具（archive）                               </p><p><strong>ar rcs libxxx.a xxx.o xxx.o</strong>                                                </p><p>r -将文件插入备存文件中                                                     </p><p>c -建立备存文件</p><p>s -索引</p><h2 id="动态库的制作"><a href="#动态库的制作" class="headerlink" title="动态库的制作"></a>动态库的制作</h2><h3 id="命名规则：-1"><a href="#命名规则：-1" class="headerlink" title="命名规则："></a>命名规则：</h3><p>linux:<strong>libxxx.so</strong>          </p><ul><li>lib:前缀、固定     </li><li>xxx:库的名字</li><li>.so：后缀</li></ul><p> 动态库在linux下是一个可执行文件</p><p> windows:   <strong>libxxx.dll</strong></p><h3 id="制作动态库"><a href="#制作动态库" class="headerlink" title="制作动态库:"></a>制作动态库:</h3><p> gcc得到**.o**文件，得到和位置无关的代码:</p><p>   <strong>gcc -c -fpic/-fpIC a.c b.c</strong></p><p>  gcc  得到动态库:</p><p>​    <strong>gcc -shared a.o b.o -o libcalc.so</strong></p><h2 id="静态库的优缺点"><a href="#静态库的优缺点" class="headerlink" title="静态库的优缺点"></a>静态库的优缺点</h2><h3 id="优点："><a href="#优点：" class="headerlink" title="优点："></a>优点：</h3><ul><li>静态库被打包到应用程序中加载速度快</li><li>发布程序无需提供静态库，移植方便</li></ul><h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点:"></a>缺点:</h3><ul><li>消耗系统资源，浪费内存</li><li>更新、部署、发布麻烦</li></ul><h2 id="动态库的优缺点："><a href="#动态库的优缺点：" class="headerlink" title="动态库的优缺点："></a>动态库的优缺点：</h2><h2 id="优点：-1"><a href="#优点：-1" class="headerlink" title="优点："></a>优点：</h2><ul><li>可以实现进程间资源共享（共享库）</li><li>更新、部署、发布简单</li><li>可以控制何时加载动态库</li></ul><h3 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点:"></a>缺点:</h3><ul><li>加载速度比静态库慢</li><li>发布程序时需要提供依赖的动态库</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 库、静态库、动态库 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>typora书写makdown博客介绍</title>
+      <link href="/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/"/>
+      <url>/2022/12/01/2018-09-07-typora-vue-theme-zhu-ti-jie-shao/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h3 id="开始书写文章"><a href="#开始书写文章" class="headerlink" title="开始书写文章"></a>开始书写文章</h3><p>写MarkDown这里推荐<strong>Typora</strong>，非常好用，点开创建的文件，先看看里面有啥</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201180851299.png"></p><p>两个虚线之间的内容就是叫<code>Front-matter</code>，主要是你文章的配置，具体配置如下，这里不同主题不一样，我以<strong>Matery</strong>主题为例</p><p><code>Front-matter</code> 选项中的所有内容均为<strong>非必填</strong>的。但我仍然建议至少填写 <code>title</code> 和 <code>date</code> 的值。</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201180943689.png"></p><p>**Tips：**你会发现一个问题，每次<code>hexo n</code>的时候<code>Front-matter</code>中内容少的可怜，那怎么修改默认的格式呢？只要去主目录下找到<code>scaffolds</code>文件夹下找到一个**post.md**文件修改即可。</p><p>markd语法：</p><p>书写标题：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181429575.png"></p><p>加粗、斜体、分隔符语法：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181636178.png"></p><p>如何换行：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181715937.png"></p><p>分割多行符：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181801622.png"></p><p>文章中插入列表：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181827454.png"></p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181916119.png"></p><p>引用格式：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201181946004.png"></p><p>插入链接方法：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201182016427.png"></p><p>文章中插入图片：</p><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221201182046541.png"></p><p>参考链接：<a href="https://blog.csdn.net/howareyou2104/article/details/106312703/?ops_request_misc=&amp;request_id=&amp;biz_id=102&amp;utm_term=matery%E5%86%99%E6%96%87%E7%AB%A0%E6%80%8E%E4%B9%88%E5%8A%A0%E6%A0%87%E7%AD%BE%E5%92%8C%E5%88%86%E7%B1%BB&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-6-106312703.142%5Ev67%5Ejs_top,201%5Ev3%5Eadd_ask,213%5Ev2%5Et3_control1&amp;spm=1018.2226.3001.4187">如何用Hexo优雅的书写文章</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Markdown </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Typora </tag>
+            
+            <tag> Markdown </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于gcc</title>
+      <link href="/2022/11/26/guan-yu-gcc/"/>
+      <url>/2022/11/26/guan-yu-gcc/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="关于GCC"><a href="#关于GCC" class="headerlink" title="关于GCC"></a>关于GCC</h1><h2 id="什么是GCC"><a href="#什么是GCC" class="headerlink" title="什么是GCC?"></a>什么是GCC?</h2><ul><li><p>GCC原名GNU C语言编译器（GUN C  Compiler）</p></li><li><p>GNU编译器套件包括C、C++、0bjective-C、Java、Ada和 Go语言前端，也包括了这些语言的库（如 libstdc++,libgcj等）</p></li><li><p>GCC不仅支持c的许多“方言”．也可以区别不同的C语言标准;可以使用命令行选项来控制编译器在翻译源代码时应该遵循哪个c标准。例如，当使用命令行参数’’-std=c99’启动GCC时，编译器支持c99标准。</p></li><li><p>安装命令 sudo apt install gcc g++ （版本.4.8.5）</p></li><li><p>查看版本 gcc/g++ -v/–version</p><br><h2 id="GCC工作流程"><a href="#GCC工作流程" class="headerlink" title="GCC工作流程"></a>GCC工作流程</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221129183504459.png" alt="GCC工作流程"></p><h2 id="GCC和G-的区别"><a href="#GCC和G-的区别" class="headerlink" title="GCC和G++的区别"></a>GCC和G++的区别</h2><h3 id="gcc和g-都是GUN（组织）的一个编译器。"><a href="#gcc和g-都是GUN（组织）的一个编译器。" class="headerlink" title="gcc和g++都是GUN（组织）的一个编译器。"></a>gcc和g++都是GUN（组织）的一个编译器。</h3><h3 id="误区一：GCC只能编译c代码，g-只能编译c-代码-两者都可以，请注意："><a href="#误区一：GCC只能编译c代码，g-只能编译c-代码-两者都可以，请注意：" class="headerlink" title="误区一：GCC只能编译c代码，g++只能编译c++代码.两者都可以，请注意："></a>误区一：GCC只能编译c代码，g++只能编译c++代码.两者都可以，请注意：</h3><p>  后缀为.c的, gcc 把它当作是c程序，而g++当作是c++程序</p><p>  后缀为.cpp 的，两者都会认为是C++程序，C++的语法规则更加严谨一些</p><p>  编译阶段， g++会调用gcc，对于C++代码，两者是等价的，但是因为gcc<br>  命令不能自动和C++程序使用的库联接，所以通常用g++来完成链接，为了统一起见，干脆编译/链接统     统用g++了，这就给人一种错觉，好像cpp程序只能用c++似的  </p><h3 id="误区二-gcc不会定义-cplusplus-宏，而g-会"><a href="#误区二-gcc不会定义-cplusplus-宏，而g-会" class="headerlink" title="误区二: gcc不会定义_cplusplus 宏，而g++会:"></a>误区二: gcc不会定义_cplusplus 宏，而g++会:</h3><p>  实际上，这个宏只是标志着编译器将会把代码按c还是C++语法来解释</p><p>  如上所述，如果后缀为.c，并且采用gcc 编译器，则该宏就是未定义的，否则就是已经定义的</p><h3 id="误区三-编译只能用gcc，链接只能用g"><a href="#误区三-编译只能用gcc，链接只能用g" class="headerlink" title="误区三:编译只能用gcc，链接只能用g++"></a>误区三:编译只能用gcc，链接只能用g++</h3><p>  严格来说，这句话不算错误，但是它混淆了概念，应该这样说:编译可以用编译可以用gcc/g++，而链接可以用g++或者gcc -lstdc++</p><p>  gcc命令不能自动和C++程序使用的库联接，所以通常使用g++来完成联接，但在编译阶段, g++会自动调用gcc，二者等价</p><h2 id="GCC常用参数选项"><a href="#GCC常用参数选项" class="headerlink" title="GCC常用参数选项"></a>GCC常用参数选项</h2><p><img src="https://images-1313943387.cos.ap-nanjing.myqcloud.com/img/image-20221129183630128.png" alt="GCC常用参数选项"></p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> linux </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> gcc </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
